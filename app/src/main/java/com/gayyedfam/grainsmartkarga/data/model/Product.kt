@@ -11,8 +11,10 @@ import com.gayyedfam.grainsmartkarga.data.local.converters.Converters
 @Entity
 data class Product(
     @PrimaryKey
-    val productId: Int,
+    val productId: String,
     val name: String,
+    val iconUrl: String,
+    val status: Boolean,
     @TypeConverters(Converters::class)
     val productType: ProductType
 )

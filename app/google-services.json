@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "185463875213",
+    "firebase_url": "https://kargadelivery.firebaseio.com",
+    "project_id": "kargadelivery",
+    "storage_bucket": "kargadelivery.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185463875213:android:142b9ee1305780b8af64c4",
+        "android_client_info": {
+          "package_name": "com.gayyedfam.grainsmartkarga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185463875213-nqg9ik8e38as2ohlildtc7cn2mm000l0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gayyedfam.grainsmartkarga",
+            "certificate_hash": "dd675614181e1b4213d8eb9ff294df958185cc75"
+          }
+        },
+        {
+          "client_id": "185463875213-cs3ah5en3e7cakjg5gu74ro4a7g07p98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC_g7co2iQIbYV1TG00F4t2io6AxmMAvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185463875213-cs3ah5en3e7cakjg5gu74ro4a7g07p98.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

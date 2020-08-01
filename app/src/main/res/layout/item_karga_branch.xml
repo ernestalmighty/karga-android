@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textSize="12sp"
+            android:textSize="10sp"
+            android:textAllCaps="true"
             android:text="Store:" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -24,9 +25,19 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewBranch"
-            android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
-            android:text="Grainsmart Cavite - Gayyed" />
+            android:textSize="16sp"
+            android:text="Grainsmart Rice General Trias" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/valueBranchAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/valueBranch"
+            android:textStyle="italic"
+            android:textSize="12sp"
+            android:text="Lancaster New City, General Trias, Cavite" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -15,6 +15,12 @@
         <action
             android:id="@+id/action_homeFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
     <fragment
         android:id="@+id/productDetailFragment"
@@ -23,16 +29,33 @@
         tools:layout="@layout/fragment_product_detail">
         <argument
             android:name="productId"
-            app:argType="integer" />
+            app:argType="string" />
         <argument
             android:name="productName"
             app:argType="string" />
         <action
             android:id="@+id/action_productDetailFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
+        <argument
+            android:name="productType"
+            app:argType="com.gayyedfam.grainsmartkarga.data.model.ProductType"
+            android:defaultValue="RICE" />
     </fragment>
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.gayyedfam.grainsmartkarga.ui.cart.CartFragment"
-        android:label="CartFragment" />
+        android:label="CartFragment" >
+        <action
+            android:id="@+id/action_cartFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.gayyedfam.grainsmartkarga.ui.profile.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.gayyedfam.grainsmartkarga.ui.profile.ProfileFragment"
+        android:label="ProfileFragment" />
 </navigation>

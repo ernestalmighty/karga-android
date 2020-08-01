@@ -7,13 +7,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
 import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
+import com.gayyedfam.grainsmartkarga.data.model.ProductVariantsWithOrders
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListener
 import kotlinx.android.synthetic.main.item_product_pricing.view.*
 
 /**
  * Created by emgayyed on 18/7/20.
  */
-class ProductPricingListAdapter(val listener: ProductsItemPricingListener, val orders: List<ProductOrder> = listOf()): RecyclerView.Adapter<ProductPricingListAdapter.ProductPricingViewHolder>() {
+class ProductPricingListAdapter(val listener: ProductsItemPricingListener,
+                                val orders: List<ProductOrder> = listOf(),
+                                val productDetailName: String): RecyclerView.Adapter<ProductPricingListAdapter.ProductPricingViewHolder>() {
 
     var list = listOf<ProductDetailVariant>()
 
@@ -48,7 +51,7 @@ class ProductPricingListAdapter(val listener: ProductsItemPricingListener, val o
             itemView.imageViewAdd.setOnClickListener {
                 quantity++
                 itemView.textViewQuantity.text = quantity.toString()
-                listener.onProductVariationOrderAdded(productDetailVariant)
+                listener.onProductVariationOrderAdded(productDetailVariant, productDetailName)
             }
 
             itemView.imageViewRemove.setOnClickListener {

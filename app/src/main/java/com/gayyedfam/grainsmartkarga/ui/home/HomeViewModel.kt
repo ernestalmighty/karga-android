@@ -20,6 +20,14 @@ class HomeViewModel @ViewModelInject constructor(
     val basketStateLiveData = MutableLiveData<OrderBasketState>()
     private val disposable = CompositeDisposable()
 
+    init {
+        load()
+    }
+
+    fun loadStore() {
+
+    }
+
     fun load() {
         disposable.add(
         getProductsUseCase()
@@ -33,18 +41,20 @@ class HomeViewModel @ViewModelInject constructor(
                 }
             })
         )
+    }
 
+    fun loadOrders() {
         disposable.add(
-        getOrdersUseCase()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                basketStateLiveData.value = OrderBasketState.OrdersLoaded(it)
-            }, {
-                it.message?.let { message ->
-                    basketStateLiveData.value = OrderBasketState.OrdersLoadError(message)
-                }
-            })
+            getOrdersUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    basketStateLiveData.value = OrderBasketState.OrdersLoaded(it)
+                }, {
+                    it.message?.let { message ->
+                        basketStateLiveData.value = OrderBasketState.OrdersLoadError(message)
+                    }
+                })
         )
     }
 }

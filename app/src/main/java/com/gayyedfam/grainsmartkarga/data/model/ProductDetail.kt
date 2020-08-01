@@ -12,31 +12,17 @@ import androidx.room.PrimaryKey
 @Entity
 data class ProductDetail(
     @PrimaryKey
-    val productDetailId: Int,
-    @ForeignKey(entity = Product::class,
-        parentColumns = ["productId"],
-        childColumns = ["productId"],
-        onDelete = CASCADE)
-    val productId: Int,
+    val productDetailId: String,
+    val productIdParent: String,
     val productDetailName: String,
-    val productDetailDescription: String = ""
-) {
-    @Ignore
-    var variants: List<ProductDetailVariant> = listOf()
-}
-
+    val productDetailDescription: String = "",
+    val productDetailImage: String = ""
+)
 @Entity
 data class ProductDetailVariant(
     @PrimaryKey
-    val productDetailVariantId: Int,
-    @ForeignKey(entity = ProductDetail::class,
-        parentColumns = ["productDetailId"],
-        childColumns = ["productDetailId"],
-        onDelete = CASCADE)
-    val productDetailId: Int,
+    val productDetailVariantId: String,
+    val productDetailId: String,
     val productDetailVariantName: String,
     val price: Float
-) {
-    @Ignore
-    var orders: List<ProductOrder> = listOf()
-}
+)

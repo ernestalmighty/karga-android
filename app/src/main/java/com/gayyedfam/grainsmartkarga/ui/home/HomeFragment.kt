@@ -1,17 +1,23 @@
 package com.gayyedfam.grainsmartkarga.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.transition.TransitionInflater
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.Product
+import com.gayyedfam.grainsmartkarga.data.model.ProductWithDetail
 import com.gayyedfam.grainsmartkarga.ui.home.adapters.ProductsGridAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.item_product_pricing.*
@@ -31,6 +37,12 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
     override fun onResume() {
         super.onResume()
+
+        homeViewModel.loadOrders()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         homeViewModel.homeStateLiveData.observeForever {
             when(it) {
@@ -54,10 +66,13 @@ class HomeFragment : Fragment(), ProductsItemListener {
             }
         }
 
-        homeViewModel.load()
-
-        imageViewBasket.setOnClickListener {
+        fabBasket.setOnClickListener {
             val direction = HomeFragmentDirections.actionHomeFragmentToCartFragment()
+            findNavController().navigate(direction)
+        }
+
+        layoutDeliveryAddress.setOnClickListener {
+            val direction = HomeFragmentDirections.actionHomeFragmentToProfileFragment()
             findNavController().navigate(direction)
         }
     }
@@ -66,7 +81,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
         textViewOrderBadge.text = value
     }
 
-    private fun setupListView(list: List<Product>) {
+    private fun setupListView(list: List<ProductWithDetail>) {
         val productsGridAdapter = ProductsGridAdapter(this)
 
         recyclerViewProducts.layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
@@ -77,10 +92,14 @@ class HomeFragment : Fragment(), ProductsItemListener {
     }
 
     override fun onProductClicked(product: Product) {
+        val extras = FragmentNavigatorExtras(
+            imageViewBasket to "cartProductDetailTransition"
+        )
         val directions = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(
             product.productId,
-            product.name
+            product.name,
+            product.productType
         )
-        findNavController().navigate(directions)
+        findNavController().navigate(directions, extras)
     }
 }

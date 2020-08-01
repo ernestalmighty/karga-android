@@ -1,9 +1,7 @@
 package com.gayyedfam.grainsmartkarga.data.model
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.gayyedfam.grainsmartkarga.data.local.converters.Converters
 
 /**
  * Created by emgayyed on 19/7/20.
@@ -12,18 +10,11 @@ import androidx.room.PrimaryKey
 data class ProductOrder(
     @PrimaryKey(autoGenerate = true)
     val productOrderId: Int = 0,
-    @ForeignKey(entity = ProductDetailVariant::class,
-        parentColumns = ["productDetailVariantId"],
-        childColumns = ["productDetailVariantId"],
-        onDelete = ForeignKey.CASCADE
-    )
-    val productDetailVariantId: Int,
-    val price: Float
-) {
-    @Ignore
-    val productDetailVariant: ProductDetailVariant ?= null
-    @Ignore
-    val productDetail: ProductDetail ?= null
-    @Ignore
-    val product: Product ?= null
-}
+    val productDetailVariantId: String,
+    val price: Float,
+    @TypeConverters(Converters::class)
+    val type: ProductType = ProductType.RICE,
+    val category: String = "",
+    val variant: String = "",
+    val quantity: Int = 0
+)
