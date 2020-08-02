@@ -33,6 +33,10 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         fromBundle(requireArguments()).productType
     }
 
+    private val productImage by lazy {
+        fromBundle(requireArguments()).productImage
+    }
+
     private val productDetailViewModel: ProductDetailViewModel by viewModels()
     private val productDetailAdapter = ProductsDetailListAdapter(this)
 
@@ -103,7 +107,7 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
     }
 
     override fun onProductVariationOrderAdded(productDetailVariant: ProductDetailVariant, productDetailName: String) {
-        productDetailViewModel.updateOrderCart(true, productDetailVariant, productType, productDetailName)
+        productDetailViewModel.updateOrderCart(true, productDetailVariant, productType, productDetailName, productImage)
     }
 
     override fun onProductVariationOrderRemoved(productDetailVariant: ProductDetailVariant) {

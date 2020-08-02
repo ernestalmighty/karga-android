@@ -1,9 +1,5 @@
 package com.gayyedfam.grainsmartkarga.data.repository
 
-import android.content.Context
-import android.os.Build
-import android.provider.Settings
-import android.telephony.TelephonyManager
 import android.util.Log
 import com.gayyedfam.grainsmartkarga.data.local.ProductDAO
 import com.gayyedfam.grainsmartkarga.data.model.*
@@ -14,6 +10,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,12 +22,12 @@ import javax.inject.Inject
  */
 class ProductsRepository @Inject constructor(private val productDAO: ProductDAO) {
 
-    fun getProducts(): Single<List<ProductWithDetail>> {
+    fun getProducts(storeId: String): Single<List<ProductWithDetail>> {
         val returnList = mutableListOf<ProductWithDetail>()
 
         return Single.create<List<ProductWithDetail>> {
             val db = Firebase.firestore
-            db.collection("inventory")
+            db.collection("stores").document(storeId).collection("inventory")
                 .get()
                 .addOnSuccessListener { result ->
                     for (document in result) {
@@ -70,8 +67,9 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
         val productDetailList = mutableListOf<ProductDetailWithVariants>()
 
         return Single.create<List<ProductDetailWithVariants>> {
+            val store = productDAO.getStore().blockingGet()
             val db = Firebase.firestore
-            db.collection("inventory").document(productId).collection("types")
+            db.collection("stores").document(store.storeId).collection("inventory").document(productId).collection("types")
                 .get()
                 .continueWithTask { result ->
                     val taskList: MutableList<Task<QuerySnapshot>> = mutableListOf()
@@ -100,10 +98,13 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                                 .subscribe()
 
                             taskList.add(
-                                db.collection("inventory")
+                                db.collection("stores")
+                                    .document(store.storeId)
+                                    .collection("inventory")
                                     .document(productId)
                                     .collection("types")
-                                    .document(id).collection("variants").get()
+                                    .document(id)
+                                    .collection("variants").get()
                             )
                         }
 
@@ -141,42 +142,86 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
         }
     }
 
-    fun postOrders(profile: Profile, list: List<OrderGroup>): Single<Boolean> {
+    fun postOrders(profile: Profile, list: List<OrderGroup>): Single<String> {
         val currentTime = Calendar.getInstance().time
 
-        val dateWithTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm a", Locale.getDefault())
+        val dateWithTimeFormat = SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault())
         val formattedTime = dateWithTimeFormat.format(currentTime)
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate = dateFormat.format(currentTime)
 
-        return Single.create<Boolean> { emitter ->
+        var totalAmount = 0F
+
+        return Single.create<String> { emitter ->
             val db = Firebase.firestore
+            val store = productDAO.getStore().blockingGet()
+
+            val nameIdentifier = profile.name.replace(" ", "_").toLowerCase()
+            val identifier = "${nameIdentifier}_${profile.deviceId}"
+
+            val ref = db.collection("stores").document(store.storeId).collection("orders")
+                .document(formattedDate)
+                .collection(identifier)
+                .document()
 
             list.forEach {
+                val productAmount = it.list.map { order ->
+                    order.price
+                }.sum()
+
+                totalAmount += productAmount
+
                 val productOrder = it.list[0]
 
                 val order = hashMapOf(
-                    "client" to profile.name,
-                    "contact" to profile.contact,
-                    "address" to profile.address,
                     "type" to productOrder.type,
                     "category" to productOrder.category,
                     "variant" to productOrder.variant,
                     "price" to productOrder.price,
                     "quantity" to it.list.size,
-                    "timestamp" to formattedTime
+                    "total_amount" to productAmount
                 )
 
-                db.collection("orders").document(formattedDate).collection(profile.deviceId)
+                db.collection("stores").document(store.storeId).collection("orders")
+                    .document(formattedDate)
+                    .collection(identifier)
+                    .document(ref.id)
+                    .collection("list")
                     .add(order)
-                    .addOnSuccessListener {
-                        emitter.onSuccess(true)
+                    .addOnSuccessListener { docRef ->
+                        emitter.onSuccess(ref.id)
                     }
                     .addOnFailureListener { ex ->
                         emitter.onError(ex)
                     }
             }
+
+            val totalMap = hashMapOf(
+                "totalAmount" to totalAmount,
+                "date" to currentTime.toString(),
+                "client" to profile.name,
+                "contact" to profile.contact,
+                "address" to profile.address
+            )
+
+            db.collection("stores").document(store.storeId).collection("orders")
+                .document(formattedDate)
+                .collection(identifier)
+                .document(ref.id)
+                .set(totalMap)
+                .addOnSuccessListener {
+                    val orderHistory = OrderHistory(
+                        ref.id,
+                        totalAmount,
+                        formattedTime
+                    )
+
+                    saveToOrderHistory(orderHistory)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe()
+                }
         }
     }
 
@@ -226,11 +271,25 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                         val id = document.id
                         val name = document.data["displayName"].toString()
                         val address = document.data["address"].toString()
+                        var contact = document.data["contact"]
+                        var social = document.data["social"]
+
+                        var contactValue = ""
+                        var socialValue = ""
+                        contact?.let {
+                            contactValue = it.toString()
+                        }
+
+                        social?.let {
+                            socialValue = it.toString()
+                        }
 
                         val store = Store(
                             storeId = id,
                             name = name,
-                            address = address
+                            address = address,
+                            contact = contactValue,
+                            social = socialValue
                         )
 
                         list.add(store)
@@ -241,6 +300,29 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                 .addOnFailureListener { exception ->
                     Log.w("TAG", "Error getting store list.", exception)
                 }
+        }
+    }
+
+    fun getStore(): Single<Store> {
+        return productDAO.getStore()
+    }
+
+    fun saveStore(store: Store): Single<Boolean> {
+        return Single.create<Boolean> {
+            productDAO.deleteStore()
+            productDAO.insert(store)
+            it.onSuccess(true)
+        }
+    }
+
+    fun getOrderHistory(): Single<List<OrderHistory>> {
+        return productDAO.getOrderHistory()
+    }
+
+    fun saveToOrderHistory(orderHistory: OrderHistory): Single<Boolean> {
+        return Single.create<Boolean> {
+            productDAO.insert(orderHistory)
+            it.onSuccess(true)
         }
     }
 }

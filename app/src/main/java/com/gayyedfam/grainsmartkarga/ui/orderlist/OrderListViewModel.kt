@@ -1,15 +1,13 @@
 package com.gayyedfam.grainsmartkarga.ui.orderlist
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gayyedfam.grainsmartkarga.data.model.OrderGroup
 import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.data.model.Profile
-import com.gayyedfam.grainsmartkarga.domain.usecase.DeleteOrdersUseCase
-import com.gayyedfam.grainsmartkarga.domain.usecase.GetOrdersUseCase
-import com.gayyedfam.grainsmartkarga.domain.usecase.GetProfileUseCase
-import com.gayyedfam.grainsmartkarga.domain.usecase.SaveOrdersUseCase
+import com.gayyedfam.grainsmartkarga.domain.usecase.*
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,6 +20,7 @@ import io.reactivex.schedulers.Schedulers
 class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetOrdersUseCase,
                                                       val getProfileUseCase: GetProfileUseCase,
                                                       val saveOrdersUseCase: SaveOrdersUseCase,
+                                                      val getOrderHistoryUseCase: GetOrderHistoryUseCase,
                                                       val deleteOrdersUseCase: DeleteOrdersUseCase) : ViewModel() {
 
     var orderBasketState = MutableLiveData<OrderBasketState>()
@@ -109,13 +108,9 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                     orderBasketState.value = OrderBasketState.OrderLoading(false)
                 }
                 .subscribe(
-                    { success ->
-                        if(success) {
-                            removeOrders()
-                            orderBasketState.value = OrderBasketState.OrderSuccessful
-                        } else {
-                            orderBasketState.value = OrderBasketState.OrderError("An error occurred unexpectedly. Please try again.")
-                        }
+                    { referenceId ->
+                        removeOrders()
+                        orderBasketState.value = OrderBasketState.OrderSuccessful(referenceId)
                     },
                     {
                         orderBasketState.value = OrderBasketState.OrderError("An error occurred unexpectedly. Please try again.")
@@ -123,6 +118,28 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                 )
         } ?: {
             orderBasketState.value = OrderBasketState.OrderError("Your delivery address is not set.")
+            orderBasketState.value = OrderBasketState.Nothing
         }()
+    }
+
+    fun orderHistory() {
+        disposable.add(
+            getOrderHistoryUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally {
+                    orderBasketState.value = OrderBasketState.Nothing
+                }
+                .subscribe(
+                    {
+                        if(it.isEmpty()) {
+                            orderBasketState.value = OrderBasketState.OrderHistoryEmpty
+                        } else {
+                            orderBasketState.value = OrderBasketState.OrderHistoryLoaded(it)
+                        }
+                    },
+                    {}
+                )
+        )
     }
 }

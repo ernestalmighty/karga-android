@@ -1,5 +1,6 @@
 package com.gayyedfam.grainsmartkarga.ui.home.adapters
 
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.gayyedfam.grainsmartkarga.data.model.Product
 import com.gayyedfam.grainsmartkarga.data.model.ProductType
 import com.gayyedfam.grainsmartkarga.data.model.ProductWithDetail
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_product_card_grid.view.*
 
 /**
@@ -44,7 +46,15 @@ class ProductsGridAdapter(val productsItemListener: ProductsItemListener): Recyc
                 .into(itemView.imageViewProduct)
 
             itemView.setOnClickListener {
-                productsItemListener.onProductClicked(product)
+                if(product.status) {
+                    productsItemListener.onProductClicked(product)
+                } else {
+                    MaterialAlertDialogBuilder(itemView.context)
+                        .setMessage("This feature will be available soon!")
+                        .setPositiveButton("OK", DialogInterface.OnClickListener { dialogInterface, i ->
+                            dialogInterface.dismiss()
+                        }).show()
+                }
             }
 
             if(product.status) {

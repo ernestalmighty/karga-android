@@ -55,4 +55,19 @@ interface ProductDAO {
 
     @Query("DELETE FROM productorder")
     fun deleteAllOrders()
+
+    @Query("SELECT * FROM store LIMIT 1")
+    fun getStore(): Single<Store>
+
+    @Query("DELETE FROM store")
+    fun deleteStore()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(store: Store)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(orderHistory: OrderHistory)
+
+    @Query("SELECT * FROM orderhistory")
+    fun getOrderHistory(): Single<List<OrderHistory>>
 }

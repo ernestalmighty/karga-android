@@ -3,16 +3,15 @@ package com.gayyedfam.grainsmartkarga.ui.productdetail.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gayyedfam.grainsmartkarga.R
-import com.gayyedfam.grainsmartkarga.data.model.ProductDetail
-import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailWithVariants
 import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListener
-import kotlinx.android.synthetic.main.item_order_summary.view.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_product_card_list.view.*
 
 /**
@@ -56,6 +55,20 @@ class ProductsDetailListAdapter(val productsItemPricingListener: ProductsItemPri
             Glide.with(itemView)
                 .load(productDetail.productDetail.productDetailImage)
                 .into(itemView.imageViewProduct)
+
+            itemView.setOnClickListener {
+                val layoutInflater = LayoutInflater.from(itemView.context)
+                val view = layoutInflater.inflate(R.layout.item_product_detail_image, null)
+
+                val imageIcon = view.findViewById<AppCompatImageView>(R.id.imageViewProduct)
+                Glide.with(view)
+                    .load(productDetail.productDetail.productDetailImage)
+                    .into(imageIcon)
+
+                MaterialAlertDialogBuilder(itemView.context)
+                    .setView(view)
+                    .show()
+            }
 
             productsPricingListAdapter.list = productDetail.variants
             productsPricingListAdapter.notifyDataSetChanged()

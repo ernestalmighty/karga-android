@@ -83,6 +83,7 @@ class ProfileFragment : Fragment() {
             when(it) {
                 is ProfileViewState.ProfileSaved -> {
                     Snackbar.make(rootView, "Profile saved successfully!", Snackbar.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
                 }
                 is ProfileViewState.ProfileLoaded -> {
                     textEditName.setText(it.profile.name)

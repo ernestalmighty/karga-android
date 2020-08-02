@@ -16,5 +16,6 @@ data class ProductOrder(
     val type: ProductType = ProductType.RICE,
     val category: String = "",
     val variant: String = "",
-    val quantity: Int = 0
+    val quantity: Int = 0,
+    val image: String = ""
 )

@@ -14,12 +14,5 @@ class MainViewModel @ViewModelInject constructor(
 ) : ViewModel()  {
 
     fun load() {
-        setupDataUseCase()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {},
-                {}
-            )
     }
 }

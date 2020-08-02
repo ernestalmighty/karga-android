@@ -12,9 +12,11 @@ import com.gayyedfam.grainsmartkarga.data.model.*
 @Database(
     entities = [
         Profile::class,
+        Store::class,
         Product::class,
         ProductDetail::class,
         ProductDetailVariant::class,
+        OrderHistory::class,
         ProductOrder::class], version = 1, exportSchema = false
 )
 @TypeConverters(Converters::class)

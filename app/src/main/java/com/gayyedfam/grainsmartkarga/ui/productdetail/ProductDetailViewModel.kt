@@ -8,6 +8,7 @@ import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.data.model.ProductType
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetOrdersUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetProductDetailsUseCase
+import com.gayyedfam.grainsmartkarga.domain.usecase.GetUserStoreUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.UpdateOrderCartUseCase
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -64,13 +65,15 @@ class ProductDetailViewModel @ViewModelInject constructor(
     fun updateOrderCart(isAdded: Boolean,
                         detailVariant: ProductDetailVariant,
                         productType: ProductType = ProductType.RICE,
-                        categoryName: String = "") {
+                        categoryName: String = "",
+                        image: String = "") {
         val productOrder = ProductOrder(
             productDetailVariantId = detailVariant.productDetailVariantId,
             price = detailVariant.price,
             type = productType,
             category = categoryName,
-            variant = detailVariant.productDetailVariantName
+            variant = detailVariant.productDetailVariantName,
+            image = image
         )
 
         disposable.add(

@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Created by emgayyed on 18/7/20.
  */
 class GetProductsUseCase @Inject constructor(private val productsRepository: ProductsRepository) {
-    operator fun invoke(): Single<List<ProductWithDetail>> {
-        return productsRepository.getProducts()
+    operator fun invoke(storeId: String): Single<List<ProductWithDetail>> {
+        return productsRepository.getProducts(storeId)
     }
 }

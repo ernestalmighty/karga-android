@@ -1,10 +1,12 @@
 package com.gayyedfam.grainsmartkarga.ui.home
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.gayyedfam.grainsmartkarga.domain.usecase.GetOrdersUseCase
-import com.gayyedfam.grainsmartkarga.domain.usecase.GetProductsUseCase
+import androidx.room.EmptyResultSetException
+import com.gayyedfam.grainsmartkarga.data.model.Store
+import com.gayyedfam.grainsmartkarga.domain.usecase.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -14,25 +16,104 @@ import io.reactivex.schedulers.Schedulers
  */
 class HomeViewModel @ViewModelInject constructor(
     val getProductsUseCase: GetProductsUseCase,
-    val getOrdersUseCase: GetOrdersUseCase): ViewModel() {
+    val getOrdersUseCase: GetOrdersUseCase,
+    val getUserStoreUseCase: GetUserStoreUseCase,
+    val getStoreListUseCase: GetStoreListUseCase,
+    val deleteOrdersUseCase: DeleteOrdersUseCase,
+    val saveStoreUseCase: SaveStoreUseCase): ViewModel() {
 
     val homeStateLiveData = MutableLiveData<HomeState>()
     val basketStateLiveData = MutableLiveData<OrderBasketState>()
+    val storeStateLiveData = MutableLiveData<StoreState>()
     private val disposable = CompositeDisposable()
+    private var userStore: Store ?= null
 
     init {
-        load()
+        loadUserStore()
+    }
+
+    private fun loadUserStore() {
+        disposable.add(
+            getUserStoreUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        storeStateLiveData.value = StoreState.UserStoreLoaded(it)
+                        storeSelected(it)
+                    },
+                    {
+                        if(it is EmptyResultSetException) {
+                            getStoreListUseCase()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                    { stores ->
+                                        storeStateLiveData.value = StoreState.UserStoreLoaded(stores.first())
+                                        storeSelected(stores.first())
+                                    },
+                                    {
+
+                                    }
+                                )
+                        } else {
+                            Log.d("TAG", "TAG")
+                        }
+                    }
+                ))
+    }
+
+    fun onResume() {
+        userStore?.let {
+            storeStateLiveData.value = StoreState.UserStoreLoaded(it)
+            load(it.storeId)
+        }
+
+        loadOrders()
     }
 
     fun loadStore() {
-
-    }
-
-    fun load() {
         disposable.add(
-        getProductsUseCase()
+        getStoreListUseCase()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                storeStateLiveData.value = StoreState.Nothing
+            }
+            .subscribe(
+                {
+                    storeStateLiveData.value = StoreState.StoresLoaded(it)
+                },
+                {
+
+                }
+            ))
+    }
+
+    fun clearOrders() {
+        disposable.add(
+        deleteOrdersUseCase()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    loadOrders()
+                },
+                {}
+            ))
+    }
+
+    fun load(storeId: String) {
+        disposable.add(
+        getProductsUseCase(storeId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                homeStateLiveData.value = HomeState.ProductLoadingProgress(true)
+            }
+            .doFinally {
+                homeStateLiveData.value = HomeState.ProductLoadingProgress(false)
+            }
             .subscribe({
                 homeStateLiveData.value = HomeState.ProductsLoaded(it)
             }, {
@@ -56,5 +137,21 @@ class HomeViewModel @ViewModelInject constructor(
                     }
                 })
         )
+    }
+
+    fun storeSelected(store: Store) {
+        userStore = store
+        disposable.add(
+        saveStoreUseCase(store)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    load(store.storeId)
+                },
+                {
+
+                }
+            ))
     }
 }

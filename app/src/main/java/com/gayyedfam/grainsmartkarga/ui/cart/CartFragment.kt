@@ -1,11 +1,13 @@
 package com.gayyedfam.grainsmartkarga.ui.cart
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -21,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_cart.*
 import kotlinx.android.synthetic.main.item_delivery_address.*
+import kotlinx.android.synthetic.main.item_order_summary.*
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -41,6 +44,7 @@ class CartFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onResume() {
         super.onResume()
+        hideKeyboard()
 
         setupList()
         imageViewBack.setOnClickListener {
@@ -67,6 +71,10 @@ class CartFragment : Fragment() {
             }
         }
 
+        imageViewHistory.setOnClickListener {
+            orderListViewModel.orderHistory()
+        }
+
         orderListViewModel.getProfile()
         orderListViewModel.load()
         orderListViewModel.orderBasketState.observeForever {
@@ -89,10 +97,10 @@ class CartFragment : Fragment() {
                 is OrderBasketState.OrderSuccessful -> {
                     context?.let { context ->
                         val dialog = MaterialAlertDialogBuilder(context)
-                            .setMessage("Your order has been logged successfully. Please wait on our call for confirmation")
+                            .setTitle("Order successful")
+                            .setMessage("Please wait on our call for confirmation.\n\nRef: ${it.referenceId}")
                             .setPositiveButton("Done", DialogInterface.OnClickListener { dialog, i ->
                                 dialog.dismiss()
-                                findNavController().popBackStack()
                             })
                         dialog.show()
                     }
@@ -106,6 +114,22 @@ class CartFragment : Fragment() {
                     } else {
                         progressBar.visibility = View.GONE
                     }
+                }
+                is OrderBasketState.OrderHistoryLoaded -> {
+                    val list = it.list.map { order ->
+                        "Date: ${order.date}\nRef: ${order.id}\nAmount: Php${order.totalAmount}\n"
+                    }.toTypedArray()
+
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle("Order History")
+                        .setItems(list, null)
+                        .show()
+                }
+                is OrderBasketState.OrderHistoryEmpty -> {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle("Order History")
+                        .setMessage("No orders yet")
+                        .show()
                 }
             }
         }
@@ -122,5 +146,14 @@ class CartFragment : Fragment() {
     private fun setupList() {
         recyclerViewOrders.adapter = orderListAdapter
         recyclerViewOrders.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    }
+
+    private fun hideKeyboard() {
+        val inputManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val focusedView = activity?.currentFocus
+        if (focusedView != null) {
+            inputManager.hideSoftInputFromWindow(focusedView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS)
+        }
     }
 }

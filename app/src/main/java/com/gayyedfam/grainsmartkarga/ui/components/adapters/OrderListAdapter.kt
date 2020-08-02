@@ -36,28 +36,9 @@ class OrderListAdapter: RecyclerView.Adapter<OrderListAdapter.CartViewHolder>() 
         fun bind(productOrder: OrderGroup) {
             val order = productOrder.list[0]
 
-            when(order.type) {
-                ProductType.RICE -> {
-                    Glide.with(view)
-                        .load(R.drawable.img_bigas)
-                        .into(itemView.imageViewOrderIcon)
-                }
-                ProductType.WATER -> {
-                    Glide.with(view)
-                        .load(R.drawable.img_tubig)
-                        .into(itemView.imageViewOrderIcon)
-                }
-                ProductType.BILLS_PAYMENT -> {
-                    Glide.with(view)
-                        .load(R.drawable.img_bills_payment)
-                        .into(itemView.imageViewOrderIcon)
-                }
-                else -> {
-                    Glide.with(view)
-                        .load(R.drawable.img_bigas)
-                        .into(itemView.imageViewOrderIcon)
-                }
-            }
+            Glide.with(view)
+                .load(order.image)
+                .into(itemView.imageViewOrderIcon)
 
             val category = order.category
             val variant = order.variant

@@ -8,4 +8,5 @@ import com.gayyedfam.grainsmartkarga.data.model.ProductWithDetail
 sealed class HomeState {
     data class ProductsLoaded(val list: List<ProductWithDetail>): HomeState()
     data class ProductLoadingError(val error: String): HomeState()
+    data class ProductLoadingProgress(val isLoading: Boolean): HomeState()
 }

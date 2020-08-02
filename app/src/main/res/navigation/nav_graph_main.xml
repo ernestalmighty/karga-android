@@ -40,6 +40,10 @@
             android:name="productType"
             app:argType="com.gayyedfam.grainsmartkarga.data.model.ProductType"
             android:defaultValue="RICE" />
+
+        <argument
+            android:name="productImage"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/cartFragment"
