@@ -27,11 +27,18 @@
                     app:layout_constraintGuide_percent="0.4" />
 
                 <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineBrand"
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.6" />
+
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineBasket"
                     android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.93" />
+                    app:layout_constraintGuide_percent="0.97" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineMiddle"
@@ -73,6 +80,16 @@
                     app:layout_constraintTop_toTopOf="@+id/guidelineMiddle"
                     android:background="@android:color/darker_gray"
                     android:text="0"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_grainsmart"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintEnd_toEndOf="@id/guidelineBasket"
+                    app:layout_constraintStart_toStartOf="@+id/guidelineBrand"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

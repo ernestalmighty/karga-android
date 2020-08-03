@@ -12,6 +12,8 @@ data class Store(
     val storeId: String,
     val name: String,
     val address: String,
+    val lat: Double,
+    val lon: Double,
     val contact: String ?= "",
     val social: String ?= ""
 )

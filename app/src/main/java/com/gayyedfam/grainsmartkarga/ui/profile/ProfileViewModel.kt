@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gayyedfam.grainsmartkarga.data.model.Profile
+import com.gayyedfam.grainsmartkarga.domain.usecase.GetDeviceLocationUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetProfileUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.SaveProfileUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -15,13 +16,30 @@ import io.reactivex.schedulers.Schedulers
  */
 class ProfileViewModel @ViewModelInject constructor(
     private val saveProfileUseCase: SaveProfileUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    private val getDeviceLocationUseCase: GetDeviceLocationUseCase
 ): ViewModel() {
     var profileViewState = MutableLiveData<ProfileViewState>()
     private val disposable = CompositeDisposable()
 
     init {
         getProfile()
+    }
+
+    private fun loadDeviceLocation() {
+        disposable.add(
+            getDeviceLocationUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        profileViewState.value = ProfileViewState.DeviceAddressLoaded(it)
+                    },
+                    {
+
+                    }
+                )
+        )
     }
 
     private fun getProfile() {
@@ -34,9 +52,7 @@ class ProfileViewModel @ViewModelInject constructor(
                     profileViewState.value = ProfileViewState.ProfileLoaded(it)
                 },
                 {
-                    it.message?.let { error ->
-                        profileViewState.value = ProfileViewState.ProfileLoadError(error)
-                    }
+                    loadDeviceLocation()
                 }
             )
         )

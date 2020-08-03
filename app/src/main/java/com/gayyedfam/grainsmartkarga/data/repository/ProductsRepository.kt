@@ -273,6 +273,16 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                         val address = document.data["address"].toString()
                         var contact = document.data["contact"]
                         var social = document.data["social"]
+                        var lat = document.data["lat"]
+                        var lon = document.data["lon"]
+
+                        if(lat == null) {
+                            lat = 0
+                        }
+
+                        if(lon == null) {
+                            lon = 0
+                        }
 
                         var contactValue = ""
                         var socialValue = ""
@@ -288,6 +298,8 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                             storeId = id,
                             name = name,
                             address = address,
+                            lat = lat as Double,
+                            lon = lon as Double,
                             contact = contactValue,
                             social = socialValue
                         )

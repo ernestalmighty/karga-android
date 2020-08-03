@@ -13,6 +13,4 @@ class MainViewModel @ViewModelInject constructor(
     private val setupDataUseCase: SetupDataUseCase
 ) : ViewModel()  {
 
-    fun load() {
-    }
 }

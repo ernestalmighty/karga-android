@@ -45,7 +45,7 @@ class ProductsDetailListAdapter(val productsItemPricingListener: ProductsItemPri
             itemView.recyclerViewPricing.addItemDecoration(
                 DividerItemDecoration(
                     itemView.context,
-                    LinearLayoutManager.HORIZONTAL
+                    LinearLayoutManager.VERTICAL
                 )
             )
             itemView.recyclerViewPricing.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)

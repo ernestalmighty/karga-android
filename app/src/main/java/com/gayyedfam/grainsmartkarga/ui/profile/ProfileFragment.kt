@@ -1,6 +1,7 @@
 package com.gayyedfam.grainsmartkarga.ui.profile
 
 import android.annotation.SuppressLint
+import android.location.Geocoder
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -14,7 +15,6 @@ import com.gayyedfam.grainsmartkarga.R
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
-import kotlinx.android.synthetic.main.item_delivery_input.*
 
 
 @AndroidEntryPoint
@@ -86,6 +86,33 @@ class ProfileFragment : Fragment() {
                     textEditName.setText(it.profile.name)
                     textEditContact.setText(it.profile.contact)
                     textEditAddress.setText(it.profile.address)
+                }
+                is ProfileViewState.DeviceAddressLoaded -> {
+                    val geoCoder = Geocoder(context)
+                    val address = geoCoder.getFromLocation(it.deviceLocation.locationLat, it.deviceLocation.locationLon, 1)
+
+                    val firstAddress = address.first()
+
+                    val deviceAddress = StringBuilder()
+                        .append(firstAddress.subThoroughfare)
+                        .append(", ")
+                        .append(firstAddress.adminArea)
+                        .append(", ")
+                        .append(firstAddress.countryCode)
+                        .append(", ")
+                        .append(firstAddress.countryName)
+                        .append(", ")
+                        .append(firstAddress.featureName)
+                        .append(", ")
+                        .append(firstAddress.locale)
+                        .append(", ")
+                        .append(firstAddress.locality)
+                        .append(", ")
+                        .append(firstAddress.premises)
+                        .append(", ")
+                        .append(firstAddress.subAdminArea)
+
+                    //textEditAddress.setText(deviceAddress.toString())
                 }
             }
         })

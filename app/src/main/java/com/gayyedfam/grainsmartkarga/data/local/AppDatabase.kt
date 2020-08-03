@@ -11,6 +11,7 @@ import com.gayyedfam.grainsmartkarga.data.model.*
  */
 @Database(
     entities = [
+        DeviceLocation::class,
         Profile::class,
         Store::class,
         Product::class,
