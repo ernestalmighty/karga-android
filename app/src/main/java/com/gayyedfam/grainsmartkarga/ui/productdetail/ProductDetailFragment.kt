@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gayyedfam.grainsmartkarga.R
@@ -48,8 +50,8 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         return inflater.inflate(R.layout.fragment_product_detail, container, false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setToolbar()
         setupList()
 
@@ -58,8 +60,9 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
             findNavController().navigate(direction)
         }
 
-        productDetailViewModel.productDetailState.observeForever {
-            when(it) {
+
+        productDetailViewModel.productDetailState.observe(viewLifecycleOwner, Observer {
+            when (it) {
                 is ProductDetailState.ProductDetailLoaded -> {
                     productDetailAdapter.list = it.productDetails
                     productDetailAdapter.notifyDataSetChanged()
@@ -68,23 +71,23 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
                 }
                 is ProductDetailState.ProductDetailLoading -> {
-                    if(it.loading) {
+                    if (it.loading) {
                         progressBar.visibility = View.VISIBLE
                     } else {
                         progressBar.visibility = View.GONE
                     }
                 }
             }
-        }
+        })
 
-        productDetailViewModel.orderBasketState.observeForever {
+        productDetailViewModel.orderBasketState.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is OrderBasketState.OrdersLoaded -> {
                     productDetailAdapter.ordersList = it.list
                     setBasketQuantity(it.list.size.toString())
                 }
             }
-        }
+        })
 
         productDetailViewModel.load(productId)
         productDetailViewModel.loadOrders()

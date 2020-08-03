@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +46,10 @@ class CartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         hideKeyboard()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupList()
         imageViewBack.setOnClickListener {
@@ -77,7 +82,7 @@ class CartFragment : Fragment() {
 
         orderListViewModel.getProfile()
         orderListViewModel.load()
-        orderListViewModel.orderBasketState.observeForever {
+        orderListViewModel.orderBasketState.observe(viewLifecycleOwner, Observer {
             progressBar.visibility = View.GONE
             when(it) {
                 is OrderBasketState.OrdersLoaded -> {
@@ -132,15 +137,15 @@ class CartFragment : Fragment() {
                         .show()
                 }
             }
-        }
+        })
 
-        orderListViewModel.profileState.observeForever {
+        orderListViewModel.profileState.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ProfileViewState.ProfileLoaded -> {
                     valueDeliveryAddress.text = it.profile.address
                 }
             }
-        }
+        })
     }
 
     private fun setupList() {

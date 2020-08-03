@@ -1,20 +1,17 @@
 package com.gayyedfam.grainsmartkarga.ui.profile
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.telephony.TelephonyManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.gayyedfam.grainsmartkarga.R
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.item_delivery_input.*
@@ -79,7 +76,7 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        profileViewModel.profileViewState.observeForever {
+        profileViewModel.profileViewState.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ProfileViewState.ProfileSaved -> {
                     Snackbar.make(rootView, "Profile saved successfully!", Snackbar.LENGTH_SHORT).show()
@@ -91,7 +88,7 @@ class ProfileFragment : Fragment() {
                     textEditAddress.setText(it.profile.address)
                 }
             }
-        }
+        })
     }
 
     @SuppressLint("HardwareIds")

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,6 +13,7 @@ import com.gayyedfam.grainsmartkarga.data.model.ProductDetailWithVariants
 import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.fragment_product_detail.*
 import kotlinx.android.synthetic.main.item_product_card_list.view.*
 
 /**
@@ -40,6 +42,12 @@ class ProductsDetailListAdapter(val productsItemPricingListener: ProductsItemPri
         fun bind(productDetail: ProductDetailWithVariants) {
             val productsPricingListAdapter = ProductPricingListAdapter(productsItemPricingListener, ordersList, productDetail.productDetail.productDetailName)
             itemView.recyclerViewPricing.adapter = productsPricingListAdapter
+            itemView.recyclerViewPricing.addItemDecoration(
+                DividerItemDecoration(
+                    itemView.context,
+                    LinearLayoutManager.HORIZONTAL
+                )
+            )
             itemView.recyclerViewPricing.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.VERTICAL, false)
 
             itemView.textViewName.text = productDetail.productDetail.productDetailName
