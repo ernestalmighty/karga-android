@@ -28,6 +28,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "environment"
+    productFlavors {
+        dev {
+            dimension "environment"
+            buildConfigField("String", "AD_MOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
+            buildConfigField("String", "AD_MOB_FULL_AD_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+        }
+        prod {
+            dimension "environment"
+            buildConfigField("String", "AD_MOB_BANNER_ID", "\"ca-app-pub-1965212949581065/9341702278\"")
+            buildConfigField("String", "AD_MOB_FULL_AD_ID", "\"ca-app-pub-1965212949581065/9121268478\"")
+        }
+    }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -96,4 +112,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
 
     implementation 'com.bugfender.sdk:android:3.+'
+    implementation 'com.google.android.gms:play-services-ads:19.3.0'
 }

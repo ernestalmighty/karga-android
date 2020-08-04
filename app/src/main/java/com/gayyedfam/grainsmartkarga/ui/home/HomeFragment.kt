@@ -6,17 +6,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.Product
 import com.gayyedfam.grainsmartkarga.data.model.ProductWithDetail
 import com.gayyedfam.grainsmartkarga.ui.home.adapters.ProductsGridAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -27,6 +32,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private var isShowingDialog = false
+    private val adRequest = AdRequest.Builder().build()
 
     private val storeStateObserver = Observer<StoreState> {
         when(it) {
@@ -118,6 +124,14 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val adView = AdView(context)
+        adView.adSize = AdSize.BANNER
+        adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
+
+        adViewContainer.addView(adView)
+
+        adView.loadAd(adRequest)
 
         homeViewModel.homeStateLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {

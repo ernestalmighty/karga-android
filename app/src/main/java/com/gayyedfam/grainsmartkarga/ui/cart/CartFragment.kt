@@ -14,11 +14,14 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.ui.components.adapters.OrderListAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.orderlist.OrderListViewModel
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +34,8 @@ class CartFragment : Fragment() {
 
     private val orderListViewModel: OrderListViewModel by viewModels()
     private val orderListAdapter = OrderListAdapter()
-    lateinit var rootView: View
+    private lateinit var interstitialAd: InterstitialAd
+    private lateinit var rootView: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +43,11 @@ class CartFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_cart, container, false)
+
+        interstitialAd = InterstitialAd(context)
+        interstitialAd.adUnitId = BuildConfig.AD_MOB_FULL_AD_ID
+        interstitialAd.loadAd(AdRequest.Builder().build())
+
         return rootView
     }
 
@@ -106,6 +115,10 @@ class CartFragment : Fragment() {
                             .setMessage("Please wait on our call for confirmation.\n\nRef: ${it.referenceId}")
                             .setPositiveButton("Done", DialogInterface.OnClickListener { dialog, i ->
                                 dialog.dismiss()
+
+                                if (interstitialAd.isLoaded) {
+                                    interstitialAd.show()
+                                }
                             })
                         dialog.show()
                     }

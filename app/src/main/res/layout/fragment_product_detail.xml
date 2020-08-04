@@ -95,6 +95,7 @@
             android:id="@+id/recyclerViewProductDetails"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/adViewContainerDetail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -129,6 +130,16 @@
             android:textSize="12sp"
             app:layout_constraintTop_toTopOf="@id/fabBasket"
             app:layout_constraintEnd_toEndOf="@id/fabBasket"/>
+
+        <RelativeLayout
+            android:id="@+id/adViewContainerDetail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
