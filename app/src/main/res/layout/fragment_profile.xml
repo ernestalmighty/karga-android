@@ -83,13 +83,20 @@
             android:id="@+id/textInputAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_margin="10dp"
             app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_map"
-            android:hint="Address">
+            app:helperTextEnabled="true"
+            app:helperText="Address"
+            app:endIconDrawable="@drawable/ic_map">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/textEditAddress"
@@ -103,11 +110,18 @@
             android:id="@+id/textInputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:layout_constraintTop_toBottomOf="@+id/textInputAddress"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="10dp"
-            android:hint="Name">
+            app:helperTextEnabled="true"
+            app:helperText="Name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/textEditName"
@@ -121,11 +135,18 @@
             android:id="@+id/textInputContact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:layout_constraintTop_toBottomOf="@+id/textInputName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="10dp"
-            android:hint="Phone">
+            app:helperTextEnabled="true"
+            app:helperText="Phone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/textEditContact"

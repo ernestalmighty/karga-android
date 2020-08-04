@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -23,6 +24,7 @@ class SplashActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1000
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var hasExpired = false
 
     private val splashViewModel: SplashViewModel by viewModels()
 
@@ -80,15 +82,31 @@ class SplashActivity : AppCompatActivity() {
                         locationResult?.let {result ->
                             fusedLocationClient.removeLocationUpdates(this)
                             result.locations.forEach {newLocation ->
-                                splashViewModel.storeUserLocation(newLocation.latitude, newLocation.longitude)
+                                if(!hasExpired) {
+                                    hasExpired = true
+                                    splashViewModel.storeUserLocation(newLocation.latitude, newLocation.longitude)
+                                }
                             }
                         } ?: {
-                            splashViewModel.storeUserLocation(lastLocation.latitude, lastLocation.longitude)
+                            if(!hasExpired) {
+                                hasExpired = true
+                                splashViewModel.storeUserLocation(lastLocation.latitude, lastLocation.longitude)
+                            }
                         }()
                     }
                 }
 
-                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                val looper = Looper.getMainLooper()
+                Handler(looper)
+                    .postDelayed(Runnable {
+                        if(!hasExpired) {
+                            hasExpired = true
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish();
+                        }
+                    }, 10000)
+
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, looper)
             }
         }
     }
