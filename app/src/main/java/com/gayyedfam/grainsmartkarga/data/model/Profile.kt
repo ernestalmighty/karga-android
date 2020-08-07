@@ -13,5 +13,6 @@ data class Profile(
     val name: String,
     val contact: String,
     val address: String,
-    val deviceId: String = ""
+    val deviceId: String = "",
+    val deliveryInstruction: String = ""
 )

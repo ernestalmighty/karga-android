@@ -41,7 +41,7 @@ class HomeViewModel @ViewModelInject constructor(
             getDeviceLocationUseCase()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doFinally {
+                .doOnSubscribe {
                     loadUserStore()
                 }
                 .subscribe(
@@ -55,7 +55,7 @@ class HomeViewModel @ViewModelInject constructor(
         )
     }
 
-    private fun loadUserStore() {
+    fun loadUserStore() {
         disposable.add(
             getUserStoreUseCase()
                 .subscribeOn(Schedulers.io())
@@ -67,37 +67,46 @@ class HomeViewModel @ViewModelInject constructor(
                     },
                     {
                         if(it is EmptyResultSetException) {
-                            getStoreListUseCase()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    { stores ->
-                                        deviceLocation?.let {
-                                            val userStore = stores.minBy { store ->
-                                                calculateDistance(store.lat, store.lon)
-                                            }
-
-                                            userStore?.let { newStore ->
-                                                storeStateLiveData.value = StoreState.UserStoreLoaded(newStore)
-                                                storeSelected(newStore)
-                                            } ?: {
-                                                storeStateLiveData.value = StoreState.UserStoreLoaded(stores.first())
-                                                storeSelected(stores.first())
-                                            }()
-                                        } ?: {
-                                            storeStateLiveData.value = StoreState.UserStoreLoaded(stores.first())
-                                            storeSelected(stores.first())
-                                        }()
-                                    },
-                                    {
-
-                                    }
-                                )
+                            storeStateLiveData.value = StoreState.UserStoreEmpty
                         } else {
                             Log.d("TAG", "TAG")
                         }
                     }
                 ))
+    }
+
+    fun emptyUserStore() {
+        disposable.add(
+        getStoreListUseCase()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { stores ->
+                    if(stores.isEmpty()) {
+                        storeStateLiveData.value = StoreState.StoreListEmpty
+                    } else {
+                        deviceLocation?.let {
+                            val userStore = stores.minBy { store ->
+                                calculateDistance(store.lat, store.lon)
+                            }
+
+                            userStore?.let { newStore ->
+                                storeStateLiveData.value = StoreState.UserStoreLoaded(newStore)
+                                storeSelected(newStore)
+                            } ?: {
+                                storeStateLiveData.value = StoreState.UserStoreLoaded(stores.first())
+                                storeSelected(stores.first())
+                            }()
+                        } ?: {
+                            storeStateLiveData.value = StoreState.UserStoreLoaded(stores.first())
+                            storeSelected(stores.first())
+                        }()
+                    }
+                },
+                {
+
+                }
+            ))
     }
 
     private fun calculateDistance(lat: Double, lon: Double): Float {
@@ -136,7 +145,11 @@ class HomeViewModel @ViewModelInject constructor(
             }
             .subscribe(
                 {
-                    storeStateLiveData.value = StoreState.StoresLoaded(it)
+                    if(it.isEmpty()) {
+                        storeStateLiveData.value = StoreState.StoreListEmpty
+                    } else {
+                        storeStateLiveData.value = StoreState.StoresLoaded(it)
+                    }
                 },
                 {
 
@@ -199,9 +212,12 @@ class HomeViewModel @ViewModelInject constructor(
         saveStoreUseCase(store)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                storeStateLiveData.value = StoreState.Nothing
+            }
             .subscribe(
                 {
-                    load(store.storeId)
+                    storeStateLiveData.value = StoreState.UserStoreSelected(store.storeId)
                 },
                 {
 

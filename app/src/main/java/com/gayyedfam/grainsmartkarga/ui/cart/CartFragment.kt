@@ -1,19 +1,28 @@
 package com.gayyedfam.grainsmartkarga.ui.cart
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.DialogInterface
+import android.content.*
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.share.Sharer
+import com.facebook.share.model.ShareLinkContent
+import com.facebook.share.model.ShareMessengerActionButton
+import com.facebook.share.model.ShareMessengerMediaTemplateContent
+import com.facebook.share.widget.MessageDialog
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.ui.components.adapters.OrderListAdapter
@@ -21,13 +30,14 @@ import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.orderlist.OrderListViewModel
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.InterstitialAd
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_cart.*
 import kotlinx.android.synthetic.main.item_delivery_address.*
-import kotlinx.android.synthetic.main.item_order_summary.*
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -107,19 +117,35 @@ class CartFragment : Fragment() {
                 is OrderBasketState.OrdersEmpty -> {
                     groupOrders.visibility = View.GONE
                     groupEmpty.visibility = View.VISIBLE
+
+                    val adView = AdView(context)
+                    adView.adSize = AdSize.SMART_BANNER
+                    adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
+
+                    adViewContainerCart.addView(adView)
+
+                    val adRequest = AdRequest.Builder().build()
+                    adView.loadAd(adRequest)
                 }
                 is OrderBasketState.OrderSuccessful -> {
                     context?.let { context ->
                         val dialog = MaterialAlertDialogBuilder(context)
                             .setTitle("Order successful")
-                            .setMessage("Please wait on our call for confirmation.\n\nRef: ${it.referenceId}")
-                            .setPositiveButton("Done", DialogInterface.OnClickListener { dialog, i ->
+                            .setMessage("Ref: ${it.referenceId}\n\nYou can paste the reference via FB messenger to chat with our admin.\n\nOtherwise wait on our call for confirmation.")
+                            .setNegativeButton("Dismiss", DialogInterface.OnClickListener { dialog, i ->
                                 dialog.dismiss()
 
                                 if (interstitialAd.isLoaded) {
                                     interstitialAd.show()
                                 }
                             })
+                            .setPositiveButton("Open Messenger") { dialogInterface, i ->
+                                val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clipData = ClipData.newPlainText("reference_no", "Order ref: ${it.referenceId}")
+                                clipboardManager.setPrimaryClip(clipData)
+
+                                orderListViewModel.orderFollowUp()
+                            }
                         dialog.show()
                     }
                 }
@@ -140,13 +166,41 @@ class CartFragment : Fragment() {
 
                     MaterialAlertDialogBuilder(context)
                         .setTitle("Order History")
-                        .setItems(list, null)
+                        .setIcon(R.drawable.ic_orders_history)
+                        .setItems(list
+                        ) { dialog, index ->
+                            val order = it.list[index]
+                            val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clipData = ClipData.newPlainText("reference_no", "Order ref: ${order.id}")
+                            clipboardManager.setPrimaryClip(clipData)
+
+                            MaterialAlertDialogBuilder(context)
+                                .setTitle("Successfully copied reference number")
+                                .setMessage("Follow up via FB messenger?")
+                                .setPositiveButton("Open Messenger") { refDialog, refIndex ->
+                                    orderListViewModel.orderFollowUp()
+                                }
+                                .setNegativeButton("Cancel") { refDialog, index ->
+                                    refDialog.dismiss()
+                                }.show()
+                        }
                         .show()
                 }
                 is OrderBasketState.OrderHistoryEmpty -> {
                     MaterialAlertDialogBuilder(context)
                         .setTitle("Order History")
                         .setMessage("No orders yet")
+                        .show()
+                }
+                is OrderBasketState.OrderFollowUp -> {
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.data = Uri.parse(it.messengerLink)
+                    startActivity(intent)
+                }
+                is OrderBasketState.NoMessengerLink -> {
+                    MaterialAlertDialogBuilder(context)
+                        .setMessage("The store has not setup a Facebook page yet. Stay tuned!")
                         .show()
                 }
             }

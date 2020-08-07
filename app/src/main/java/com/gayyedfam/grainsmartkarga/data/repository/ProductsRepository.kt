@@ -153,16 +153,15 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
 
         var totalAmount = 0F
 
+        var orderDetails: StringBuilder = java.lang.StringBuilder()
+
         return Single.create<String> { emitter ->
             val db = Firebase.firestore
             val store = productDAO.getStore().blockingGet()
 
-            val nameIdentifier = profile.name.replace(" ", "_").toLowerCase()
-            val identifier = "${nameIdentifier}_${profile.deviceId}"
-
             val ref = db.collection("stores").document(store.storeId).collection("orders")
                 .document(formattedDate)
-                .collection(identifier)
+                .collection(profile.deviceId)
                 .document()
 
             list.forEach {
@@ -175,22 +174,39 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                 val productOrder = it.list[0]
 
                 val order = hashMapOf(
-                    "type" to productOrder.type,
-                    "category" to productOrder.category,
-                    "variant" to productOrder.variant,
-                    "price" to productOrder.price,
-                    "quantity" to it.list.size,
-                    "total_amount" to productAmount
+                    "Product Type" to productOrder.type,
+                    "Category" to productOrder.category,
+                    "Variant" to productOrder.variant,
+                    "Price" to productOrder.price,
+                    "Quantity" to it.list.size,
+                    "Total Amount" to productAmount
                 )
 
                 db.collection("stores").document(store.storeId).collection("orders")
                     .document(formattedDate)
-                    .collection(identifier)
+                    .collection(profile.deviceId)
                     .document(ref.id)
                     .collection("list")
                     .add(order)
                     .addOnSuccessListener { docRef ->
                         emitter.onSuccess(ref.id)
+
+                        val htmlBuilder = StringBuilder()
+                        htmlBuilder.append("<p><b>Order Detail:</b></p>")
+                        htmlBuilder.append("<table>")
+
+                        for ((key, value) in order.entries) {
+                            htmlBuilder.append(
+                                String.format(
+                                    "<tr><td>%s</td><td>%s</td></tr>",
+                                    key, value
+                                )
+                            )
+                        }
+
+                        htmlBuilder.append("</table>")
+
+                        orderDetails.append(htmlBuilder.toString())
                     }
                     .addOnFailureListener { ex ->
                         emitter.onError(ex)
@@ -198,16 +214,18 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
             }
 
             val totalMap = hashMapOf(
-                "totalAmount" to totalAmount,
-                "date" to currentTime.toString(),
-                "client" to profile.name,
-                "contact" to profile.contact,
-                "address" to profile.address
+                "Total Amount" to totalAmount,
+                "Date" to currentTime.toString(),
+                "Client Name" to profile.name,
+                "Contact" to profile.contact,
+                "Address" to profile.address,
+                "Delivery Instructions" to profile.deliveryInstruction,
+                "Status" to "unconfirmed"
             )
 
             db.collection("stores").document(store.storeId).collection("orders")
                 .document(formattedDate)
-                .collection(identifier)
+                .collection(profile.deviceId)
                 .document(ref.id)
                 .set(totalMap)
                 .addOnSuccessListener {
@@ -221,6 +239,46 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe()
+
+                    val htmlBuilder = StringBuilder()
+                    htmlBuilder.append("<p><b>Summary</b></p>")
+                    htmlBuilder.append("<table>")
+
+                    for ((key, value) in totalMap.entries) {
+                        htmlBuilder.append(
+                            String.format(
+                                "<tr><td>%s</td><td>%s</td></tr>",
+                                key, value
+                            )
+                        )
+                    }
+
+                    htmlBuilder.append("</table>")
+                    htmlBuilder.append(orderDetails)
+
+                    val html = htmlBuilder.toString()
+
+                    val messageMap = hashMapOf(
+                        "subject" to "You have a new order!",
+                        "text" to "Grainsmart ${store.name}",
+                        "html" to html
+                    )
+
+                    val mailMap = hashMapOf(
+                        "to" to "kargadeliveryph@gmail.com",
+                        "message" to messageMap,
+                        "cc" to "${store.email}"
+                    )
+
+                    db.collection("mail")
+                        .document()
+                        .set(mailMap)
+                        .addOnSuccessListener {
+
+                        }
+                        .addOnFailureListener {
+
+                        }
                 }
         }
     }
@@ -271,8 +329,10 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                         val id = document.id
                         val name = document.data["displayName"].toString()
                         val address = document.data["address"].toString()
+                        val email = document.data["email"].toString()
                         var contact = document.data["contact"]
                         var social = document.data["social"]
+                        var messenger = document.data["messenger"]
                         var lat = document.data["lat"]
                         var lon = document.data["lon"]
 
@@ -286,12 +346,17 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
 
                         var contactValue = ""
                         var socialValue = ""
+                        var messengerValue = ""
                         contact?.let {
                             contactValue = it.toString()
                         }
 
                         social?.let {
                             socialValue = it.toString()
+                        }
+
+                        messenger?.let {
+                            messengerValue = it.toString()
                         }
 
                         val store = Store(
@@ -301,7 +366,9 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                             lat = lat as Double,
                             lon = lon as Double,
                             contact = contactValue,
-                            social = socialValue
+                            social = socialValue,
+                            email = email,
+                            messenger = messengerValue
                         )
 
                         list.add(store)

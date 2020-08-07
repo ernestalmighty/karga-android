@@ -5,4 +5,5 @@
     <color name="colorAccent">#8b6b61</color>
 
     <color name="toolbar_background">#FFFFFF</color>
+    <color name="icon_toolbar_color">@color/colorPrimaryDark</color>
 </resources>

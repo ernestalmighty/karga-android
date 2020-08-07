@@ -58,12 +58,13 @@ class ProfileViewModel @ViewModelInject constructor(
         )
     }
 
-    fun save(name: String, contact: String, address: String, deviceId: String) {
+    fun save(name: String, contact: String, address: String, deviceId: String, instruction: String) {
         val profile = Profile(
             name = name,
             contact = contact,
             address = address,
-            deviceId = deviceId
+            deviceId = deviceId,
+            deliveryInstruction = instruction
         )
 
         disposable.add(

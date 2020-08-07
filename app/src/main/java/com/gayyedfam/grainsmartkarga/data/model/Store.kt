@@ -15,5 +15,7 @@ data class Store(
     val lat: Double,
     val lon: Double,
     val contact: String ?= "",
-    val social: String ?= ""
+    val social: String ?= "",
+    val email: String ?= "",
+    val messenger: String ?= ""
 )

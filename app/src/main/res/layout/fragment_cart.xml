@@ -61,13 +61,14 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageViewHistory"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginEnd="12dp"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_basket" />
+                    app:srcCompat="@drawable/ic_orders_history" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -184,19 +185,26 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/cardViewList"
-            app:layout_constraintBottom_toTopOf="@+id/buttonProceed" />
+            app:layout_constraintBottom_toTopOf="@+id/cardViewCart" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonProceed"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardViewCart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="PROCEED"
-            android:textSize="12sp"
-            android:visibility="gone"
+            app:cardElevation="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonProceed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text="PROCEED"
+                android:textSize="12sp" />
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/groupOrders"
@@ -206,7 +214,7 @@
             app:constraint_referenced_ids="
             textViewPurchaseTotal,
             textViewTotalLabel,
-            buttonProceed,
+            cardViewCart,
             cardViewList"/>
 
         <com.google.android.material.textview.MaterialTextView
@@ -234,12 +242,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <RelativeLayout
+            android:id="@+id/adViewContainerCart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+        </RelativeLayout>
+
         <androidx.constraintlayout.widget.Group
             android:id="@+id/groupEmpty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="animationEmptyView,textViewEmptyLabel"/>
+            app:constraint_referenced_ids="animationEmptyView,textViewEmptyLabel,adViewContainerCart"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

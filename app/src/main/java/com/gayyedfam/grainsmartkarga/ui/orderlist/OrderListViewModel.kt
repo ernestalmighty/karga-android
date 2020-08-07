@@ -21,6 +21,7 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                                                       val getProfileUseCase: GetProfileUseCase,
                                                       val saveOrdersUseCase: SaveOrdersUseCase,
                                                       val getOrderHistoryUseCase: GetOrderHistoryUseCase,
+                                                      val getUserStoreUseCase: GetUserStoreUseCase,
                                                       val deleteOrdersUseCase: DeleteOrdersUseCase) : ViewModel() {
 
     var orderBasketState = MutableLiveData<OrderBasketState>()
@@ -94,6 +95,25 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
 
                 }
             ))
+    }
+
+    fun orderFollowUp() {
+        disposable.add(
+            getUserStoreUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        it.messenger?.let { link ->
+                            orderBasketState.value = OrderBasketState.OrderFollowUp(link)
+                        }
+                    },
+                    {
+
+                    }
+                )
+
+        )
     }
 
     fun orderConfirmation() {

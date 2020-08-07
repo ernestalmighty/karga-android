@@ -2,6 +2,7 @@ package com.gayyedfam.grainsmartkarga
 
 import android.app.Application
 import com.bugfender.sdk.Bugfender
+import com.facebook.FacebookSdk
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -16,5 +17,8 @@ class GrainsmartKargaApp: Application() {
         Bugfender.enableCrashReporting()
         Bugfender.enableUIEventLogging(this)
         Bugfender.enableLogcatLogging()
+
+        FacebookSdk.setApplicationId("1694922733995611")
+        FacebookSdk.sdkInitialize(this)
     }
 }

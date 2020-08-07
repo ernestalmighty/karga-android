@@ -8,7 +8,6 @@ import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.data.model.ProductType
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetOrdersUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetProductDetailsUseCase
-import com.gayyedfam.grainsmartkarga.domain.usecase.GetUserStoreUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.UpdateOrderCartUseCase
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +26,7 @@ class ProductDetailViewModel @ViewModelInject constructor(
     val orderBasketState = MutableLiveData<OrderBasketState>()
 
     private val disposable = CompositeDisposable()
+    private var initialOrderCount: Int = 0
 
     fun load(productId: String) {
         disposable.add(
@@ -54,7 +54,11 @@ class ProductDetailViewModel @ViewModelInject constructor(
         getOrdersUseCase()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                orderBasketState.value = OrderBasketState.OrderUpdated(initialOrderCount)
+            }
             .subscribe({
+                initialOrderCount = it.size
                 orderBasketState.value = OrderBasketState.OrdersLoaded(it)
             }, {
 
@@ -67,6 +71,9 @@ class ProductDetailViewModel @ViewModelInject constructor(
                         productType: ProductType = ProductType.RICE,
                         categoryName: String = "",
                         image: String = "") {
+
+
+
         val productOrder = ProductOrder(
             productDetailVariantId = detailVariant.productDetailVariantId,
             price = detailVariant.price,
@@ -76,12 +83,19 @@ class ProductDetailViewModel @ViewModelInject constructor(
             image = image
         )
 
+        if(isAdded) {
+            initialOrderCount++
+        } else {
+            initialOrderCount--
+        }
+
         disposable.add(
         updateOrderCartUseCase(productOrder, isAdded)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                loadOrders()
+                orderBasketState.value = OrderBasketState.OrderUpdated(initialOrderCount)
+                //loadOrders()
             }
             .subscribe()
         )

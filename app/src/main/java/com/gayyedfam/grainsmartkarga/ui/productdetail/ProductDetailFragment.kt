@@ -62,7 +62,7 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
         val adRequest = AdRequest.Builder().build()
         val adView = AdView(context)
-        adView.adSize = AdSize.BANNER
+        adView.adSize = AdSize.SMART_BANNER
         adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
 
         adViewContainerDetail.addView(adView)
@@ -71,7 +71,7 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         setToolbar()
         setupList()
 
-        fabBasket.setOnClickListener {
+        buttonViewCart.setOnClickListener {
             val direction = ProductDetailFragmentDirections.actionProductDetailFragmentToCartFragment()
             findNavController().navigate(direction)
         }
@@ -100,7 +100,13 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
             when(it) {
                 is OrderBasketState.OrdersLoaded -> {
                     productDetailAdapter.ordersList = it.list
-                    setBasketQuantity(it.list.size.toString())
+                }
+                is OrderBasketState.OrderUpdated -> {
+                    if(it.count == 0) {
+                        buttonViewCart.visibility = View.GONE
+                    } else {
+                        buttonViewCart.visibility = View.VISIBLE
+                    }
                 }
             }
         })
@@ -111,6 +117,12 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
     private fun setBasketQuantity(value: String) {
         textViewOrderBadge.text = value
+
+        if(value == "0") {
+            buttonViewCart.visibility = View.GONE
+        } else {
+            buttonViewCart.visibility = View.VISIBLE
+        }
     }
 
     private fun setToolbar() {

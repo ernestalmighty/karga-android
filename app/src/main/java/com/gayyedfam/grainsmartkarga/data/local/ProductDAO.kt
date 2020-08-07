@@ -68,6 +68,6 @@ interface ProductDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(orderHistory: OrderHistory)
 
-    @Query("SELECT * FROM orderhistory")
+    @Query("SELECT * FROM orderhistory ORDER BY date DESC")
     fun getOrderHistory(): Single<List<OrderHistory>>
 }

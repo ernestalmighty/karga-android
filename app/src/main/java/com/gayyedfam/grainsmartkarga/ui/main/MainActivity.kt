@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
+import com.facebook.FacebookSdk
 import com.gayyedfam.grainsmartkarga.R
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*

@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <provider android:authorities="com.facebook.app.FacebookContentProvider{1694922733995611}"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1965212949581065~8686154203"/>

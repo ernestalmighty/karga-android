@@ -12,7 +12,7 @@
         <item name="android:background">@color/toolbar_background</item>
     </style>
 
-    <style name="SplashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="SplashScreenTheme" parent="AppTheme">
         <item name="android:windowBackground">@drawable/bg_splash_screen</item>
     </style>
 

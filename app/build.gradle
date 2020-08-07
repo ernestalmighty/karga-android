@@ -15,8 +15,8 @@ android {
         applicationId "com.gayyedfam.grainsmartkarga"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 6
-        versionName "1.4"
+        versionCode 8
+        versionName "1.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,7 +34,7 @@ android {
         dev {
             dimension "environment"
             buildConfigField("String", "AD_MOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
-            buildConfigField("String", "AD_MOB_FULL_AD_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+            buildConfigField("String", "AD_MOB_FULL_AD_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
         }
         prod {
             dimension "environment"
@@ -113,4 +113,7 @@ dependencies {
 
     implementation 'com.bugfender.sdk:android:3.+'
     implementation 'com.google.android.gms:play-services-ads:19.3.0'
+
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation 'com.facebook.android:facebook-share:[5,6)'
 }

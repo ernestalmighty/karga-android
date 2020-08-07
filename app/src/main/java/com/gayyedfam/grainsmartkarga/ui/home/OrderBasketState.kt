@@ -15,7 +15,10 @@ sealed class OrderBasketState {
     data class OrderSuccessful(val referenceId: String): OrderBasketState()
     data class OrderError(val message: String): OrderBasketState()
     data class OrderHistoryLoaded(val list: List<OrderHistory>): OrderBasketState()
+    data class OrderFollowUp(val messengerLink: String): OrderBasketState()
+    object NoMessengerLink: OrderBasketState()
     object OrderHistoryEmpty: OrderBasketState()
     object OrdersEmpty: OrderBasketState()
+    data class OrderUpdated(val count: Int): OrderBasketState()
     object Nothing: OrderBasketState()
 }

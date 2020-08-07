@@ -86,7 +86,7 @@ class ProfileFragment : Fragment() {
             }
 
             if(isValid) {
-                profileViewModel.save(name, contact, address, getDeviceId())
+                profileViewModel.save(name, contact, address, getDeviceId(), textEditInstructions.text.toString())
             }
         }
 
@@ -100,33 +100,34 @@ class ProfileFragment : Fragment() {
                     textEditName.setText(it.profile.name)
                     textEditContact.setText(it.profile.contact)
                     textEditAddress.setText(it.profile.address)
+                    textEditInstructions.setText(it.profile.deliveryInstruction)
                 }
                 is ProfileViewState.DeviceAddressLoaded -> {
-                    val geoCoder = Geocoder(context)
-                    val address = geoCoder.getFromLocation(it.deviceLocation.locationLat, it.deviceLocation.locationLon, 1)
+//                    val geoCoder = Geocoder(context)
+//                    val address = geoCoder.getFromLocation(it.deviceLocation.locationLat, it.deviceLocation.locationLon, 1)
+//
+//                    val firstAddress = address.first()
+//
+//                    val deviceAddress = StringBuilder()
+//                        .append(firstAddress.subThoroughfare)
+//                        .append(", ")
+//                        .append(firstAddress.adminArea)
+//                        .append(", ")
+//                        .append(firstAddress.countryCode)
+//                        .append(", ")
+//                        .append(firstAddress.countryName)
+//                        .append(", ")
+//                        .append(firstAddress.featureName)
+//                        .append(", ")
+//                        .append(firstAddress.locale)
+//                        .append(", ")
+//                        .append(firstAddress.locality)
+//                        .append(", ")
+//                        .append(firstAddress.premises)
+//                        .append(", ")
+//                        .append(firstAddress.subAdminArea)
 
-                    val firstAddress = address.first()
-
-                    val deviceAddress = StringBuilder()
-                        .append(firstAddress.subThoroughfare)
-                        .append(", ")
-                        .append(firstAddress.adminArea)
-                        .append(", ")
-                        .append(firstAddress.countryCode)
-                        .append(", ")
-                        .append(firstAddress.countryName)
-                        .append(", ")
-                        .append(firstAddress.featureName)
-                        .append(", ")
-                        .append(firstAddress.locale)
-                        .append(", ")
-                        .append(firstAddress.locality)
-                        .append(", ")
-                        .append(firstAddress.premises)
-                        .append(", ")
-                        .append(firstAddress.subAdminArea)
-
-                    //textEditAddress.setText(deviceAddress.toString())
+//                    textEditAddress.setText(deviceAddress.toString())
                 }
             }
         })

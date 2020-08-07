@@ -19,9 +19,8 @@ import com.gayyedfam.grainsmartkarga.data.model.Product
 import com.gayyedfam.grainsmartkarga.data.model.ProductWithDetail
 import com.gayyedfam.grainsmartkarga.ui.home.adapters.ProductsGridAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
+import com.gayyedfam.grainsmartkarga.utils.isNetworkConnected
+import com.google.android.gms.ads.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -40,6 +39,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
                 Log.d("TAG", "TAG")
             }
             is StoreState.StoresLoaded -> {
+                lottieEmptyBag.visibility = View.GONE
                 val list = it.list.map { store ->
                     store.name
                 }.toTypedArray()
@@ -105,6 +105,42 @@ class HomeFragment : Fragment(), ProductsItemListener {
                     valueBranchSocial.visibility = View.GONE
                 }()
             }
+            is StoreState.UserStoreEmpty -> {
+                context?.let { ctx ->
+                    if(ctx.isNetworkConnected()) {
+                        homeViewModel.emptyUserStore()
+                    } else {
+                        MaterialAlertDialogBuilder(ctx)
+                            .setTitle("Your internet is not connected")
+                            .setMessage("Please ensure you have a stable network connection to get the latest products.")
+                            .setPositiveButton("Retry") { dialogInterface, i ->
+                                dialogInterface.dismiss()
+                                homeViewModel.loadUserStore()
+                            }
+                            .setNegativeButton("Cancel") { dialogInterface, i ->
+                                dialogInterface.dismiss()
+                            }
+                            .show()
+                    }
+                }
+            }
+            is StoreState.UserStoreSelected -> {
+                homeViewModel.load(it.store)
+            }
+            is StoreState.StoreListEmpty -> {
+                lottieEmptyBag.visibility = View.VISIBLE
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Sorry!")
+                    .setMessage("We cannot load the stores as of the moment. Please try again later.")
+                    .setPositiveButton("Retry") { dialogInterface, i ->
+                        dialogInterface.dismiss()
+                        homeViewModel.emptyUserStore()
+                    }
+                    .setNegativeButton("Cancel") { dialogInterface, i ->
+                        dialogInterface.dismiss()
+                    }
+                    .show()
+            }
         }
     }
 
@@ -126,8 +162,41 @@ class HomeFragment : Fragment(), ProductsItemListener {
         super.onViewCreated(view, savedInstanceState)
 
         val adView = AdView(context)
-        adView.adSize = AdSize.BANNER
+        adView.adSize = AdSize.SMART_BANNER
         adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
+        adView.adListener = object : AdListener() {
+            override fun onAdImpression() {
+                super.onAdImpression()
+            }
+
+            override fun onAdLeftApplication() {
+                super.onAdLeftApplication()
+            }
+
+            override fun onAdClicked() {
+                super.onAdClicked()
+            }
+
+            override fun onAdFailedToLoad(p0: Int) {
+                super.onAdFailedToLoad(p0)
+            }
+
+            override fun onAdFailedToLoad(p0: LoadAdError?) {
+                super.onAdFailedToLoad(p0)
+            }
+
+            override fun onAdClosed() {
+                super.onAdClosed()
+            }
+
+            override fun onAdOpened() {
+                super.onAdOpened()
+            }
+
+            override fun onAdLoaded() {
+                super.onAdLoaded()
+            }
+        }
 
         adViewContainer.addView(adView)
 
