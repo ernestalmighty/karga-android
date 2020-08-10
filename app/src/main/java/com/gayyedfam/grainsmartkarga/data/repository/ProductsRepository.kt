@@ -1,7 +1,9 @@
 package com.gayyedfam.grainsmartkarga.data.repository
 
+import android.location.Location
 import android.util.Log
 import com.gayyedfam.grainsmartkarga.data.local.ProductDAO
+import com.gayyedfam.grainsmartkarga.data.local.ProfileDAO
 import com.gayyedfam.grainsmartkarga.data.model.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -20,7 +22,8 @@ import javax.inject.Inject
 /**
  * Created by emgayyed on 18/7/20.
  */
-class ProductsRepository @Inject constructor(private val productDAO: ProductDAO) {
+class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
+                                             private val profileDAO: ProfileDAO) {
 
     fun getProducts(storeId: String): Single<List<ProductWithDetail>> {
         val returnList = mutableListOf<ProductWithDetail>()
@@ -120,12 +123,19 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
                             val variantId = document.id
                             val variantName = document.data["displayName"].toString()
                             val variantPrice = document.data["price"] as Long
+                            val stocksLeft = document.data["stock"]
+
+                            var stocks = -1L
+                            stocksLeft?.let {
+                                stocks = it as Long
+                            }
 
                             val productDetailVariant = ProductDetailVariant(
                                 productDetailVariantId = variantId,
                                 productDetailId = productDetailList[index].productDetail.productDetailId,
                                 productDetailVariantName = variantName,
-                                price = variantPrice.toFloat()
+                                price = variantPrice.toFloat(),
+                                stocksLeft = stocks.toInt()
                             )
 
                             variantsList.add(productDetailVariant)
@@ -382,8 +392,52 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO)
         }
     }
 
+    fun getDeliveryFee(): Single<DeliveryFee> {
+        return Single.create<DeliveryFee> {
+            val db = Firebase.firestore
+            val store = productDAO.getStore().blockingGet()
+            db.collection("stores").document(store.storeId).collection("fees")
+                .get()
+                .addOnSuccessListener { result ->
+                    val deliveryFee = DeliveryFee()
+                    for (document in result) {
+                        val id = document.id
+                        val isEnabled = document.data["deliveryFeeEnabled"] as Boolean
+                        val radiusFree = document.data["deliveryFeeRadiusFree"] as Long
+                        val deliveryExtra = document.data["deliveryExtraPeso"] as Long
+                        val displayName = document.data["displayName"] as String
+
+                        deliveryFee.displayName = displayName
+                        deliveryFee.isEnabled = isEnabled
+                        deliveryFee.freeRadius = radiusFree.toInt()
+                        deliveryFee.deliveryExtra = deliveryExtra.toInt()
+                    }
+
+                    it.onSuccess(deliveryFee)
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("TAG", "Error getting documents.", exception)
+                }
+        }
+    }
+
     fun getStore(): Single<Store> {
         return productDAO.getStore()
+    }
+
+    fun getDistanceDeviceStore(): Single<Double> {
+        return Single.create<Double> {
+
+            val deviceLocation = profileDAO.getDeviceLocation().blockingGet()
+            val storeLocation = productDAO.getStore().blockingGet()
+
+            val results = FloatArray(1)
+            Location.distanceBetween(storeLocation.lat,
+                storeLocation.lon,
+            deviceLocation.locationLat, deviceLocation.locationLon, results)
+
+            it.onSuccess(results[0].toDouble())
+        }
     }
 
     fun saveStore(store: Store): Single<Boolean> {

@@ -111,6 +111,8 @@ class CartFragment : Fragment() {
                 }
                 is OrderBasketState.OrdersSummarized -> {
                     textViewPurchaseTotal.text = it.totalAmount
+                    textViewDeliveryFee.text = it.deliveryFee
+
                     orderListAdapter.list = it.list
                     orderListAdapter.notifyDataSetChanged()
                 }

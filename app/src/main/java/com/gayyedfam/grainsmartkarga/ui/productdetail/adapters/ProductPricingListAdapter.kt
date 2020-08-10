@@ -38,7 +38,31 @@ class ProductPricingListAdapter(val listener: ProductsItemPricingListener,
         fun bind(productDetailVariant: ProductDetailVariant) {
             val name = productDetailVariant.productDetailVariantName
             val price = productDetailVariant.price
+            val stocks = productDetailVariant.stocksLeft
+
             itemView.textViewProductVariation.text = "$name (Php ${price})"
+
+            if(productDetailVariant.stocksLeft <= 5) {
+                when {
+                    productDetailVariant.stocksLeft > 0 -> {
+                        if(productDetailVariant.stocksLeft == 1) {
+                            itemView.textViewStocks.text = "$stocks stock left"
+                        } else {
+                            itemView.textViewStocks.text = "$stocks stocks left"
+                        }
+                        itemView.textViewStocks.visibility = View.VISIBLE
+                    }
+                    productDetailVariant.stocksLeft == 0 -> {
+                        itemView.textViewStocks.visibility = View.VISIBLE
+                        itemView.textViewStocks.text = "Sold out"
+                    }
+                    else -> {
+                        itemView.textViewStocks.visibility = View.GONE
+                    }
+                }
+            } else {
+                itemView.textViewStocks.visibility = View.GONE
+            }
 
             val orderList = orders.filter {
                 it.productDetailVariantId == productDetailVariant.productDetailVariantId
@@ -49,9 +73,11 @@ class ProductPricingListAdapter(val listener: ProductsItemPricingListener,
             itemView.textViewQuantity.text = quantity.toString()
 
             itemView.imageViewAdd.setOnClickListener {
-                quantity++
-                itemView.textViewQuantity.text = quantity.toString()
-                listener.onProductVariationOrderAdded(productDetailVariant, productDetailName)
+                if(quantity < stocks || stocks < 0) {
+                    quantity++
+                    itemView.textViewQuantity.text = quantity.toString()
+                    listener.onProductVariationOrderAdded(productDetailVariant, productDetailName)
+                }
             }
 
             itemView.imageViewRemove.setOnClickListener {

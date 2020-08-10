@@ -104,7 +104,7 @@ class SplashActivity : AppCompatActivity() {
                             startActivity(Intent(this, MainActivity::class.java))
                             finish();
                         }
-                    }, 10000)
+                    }, 5000)
 
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, looper)
             }

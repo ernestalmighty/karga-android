@@ -1,5 +1,6 @@
 package com.gayyedfam.grainsmartkarga.ui.orderlist
 
+import android.location.Location
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
@@ -10,9 +11,12 @@ import com.gayyedfam.grainsmartkarga.data.model.Profile
 import com.gayyedfam.grainsmartkarga.domain.usecase.*
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.roundToInt
 
 /**
  * Created by emgayyed on 24/7/20.
@@ -22,7 +26,9 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                                                       val saveOrdersUseCase: SaveOrdersUseCase,
                                                       val getOrderHistoryUseCase: GetOrderHistoryUseCase,
                                                       val getUserStoreUseCase: GetUserStoreUseCase,
-                                                      val deleteOrdersUseCase: DeleteOrdersUseCase) : ViewModel() {
+                                                      val getAdditionalFeeUseCase: GetAdditionalFeeUseCase,
+                                                      val deleteOrdersUseCase: DeleteOrdersUseCase,
+                                                      val getStoreUseDistanceUseCase: GetStoreUseDistanceUseCase) : ViewModel() {
 
     var orderBasketState = MutableLiveData<OrderBasketState>()
     var profileState = MutableLiveData<ProfileViewState>()
@@ -61,25 +67,57 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
     }
 
     fun orderSummary(orderList: List<ProductOrder>) {
-        val totalAmount = orderList.map { order ->
-            order.price
-        }.sum()
+        disposable.add(
+        getAdditionalFeeUseCase()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { deliveryFee ->
 
-        val result = orderList.groupBy { order ->
-            order.productDetailVariantId
-        }
+                    getStoreUseDistanceUseCase()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            { distance ->
+                                val kilometerDistance = (distance / 1000).roundToInt()
+                                var additionalFee = 0
+                                if(deliveryFee.isEnabled) {
+                                    if(kilometerDistance > deliveryFee.freeRadius) {
+                                        val extraDistance = (kilometerDistance - deliveryFee.freeRadius)
+                                        additionalFee = extraDistance * deliveryFee.deliveryExtra
+                                    }
+                                }
 
-        val orderGroups = mutableListOf<OrderGroup>()
-        result.entries.map {(_, group) ->
-            val orderGroup = OrderGroup(
-                group[0].productDetailVariantId,
-                group
+                                val totalAmount = orderList.map { order ->
+                                    order.price
+                                }.sum()
+
+                                val result = orderList.groupBy { order ->
+                                    order.productDetailVariantId
+                                }
+
+                                val orderGroups = mutableListOf<OrderGroup>()
+                                result.entries.map {(_, group) ->
+                                    val orderGroup = OrderGroup(
+                                        group[0].productDetailVariantId,
+                                        group
+                                    )
+                                    orderGroups.add(orderGroup)
+                                }
+
+                                this.orderGroup = orderGroups
+                                orderBasketState.value = OrderBasketState.OrdersSummarized((totalAmount + additionalFee).toString(), additionalFee.toString(), orderGroups)
+                            },
+                            {
+                                orderBasketState.value = OrderBasketState.Nothing
+                            }
+                        )
+                },
+                {
+                    orderBasketState.value = OrderBasketState.Nothing
+                }
             )
-            orderGroups.add(orderGroup)
-        }
-
-        this.orderGroup = orderGroups
-        orderBasketState.value = OrderBasketState.OrdersSummarized(totalAmount.toString(), orderGroups)
+        )
     }
 
     private fun removeOrders() {

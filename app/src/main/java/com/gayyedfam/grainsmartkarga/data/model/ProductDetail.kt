@@ -24,5 +24,6 @@ data class ProductDetailVariant(
     val productDetailVariantId: String,
     val productDetailId: String,
     val productDetailVariantName: String,
-    val price: Float
+    val price: Float,
+    val stocksLeft: Int = -1
 )

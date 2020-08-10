@@ -60,16 +60,17 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setToolbar()
+        setupList()
+
         val adRequest = AdRequest.Builder().build()
         val adView = AdView(context)
         adView.adSize = AdSize.SMART_BANNER
         adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
 
         adViewContainerDetail.addView(adView)
-        adView.loadAd(adRequest)
 
-        setToolbar()
-        setupList()
+        adView.loadAd(adRequest)
 
         buttonViewCart.setOnClickListener {
             val direction = ProductDetailFragmentDirections.actionProductDetailFragmentToCartFragment()
@@ -104,8 +105,10 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
                 is OrderBasketState.OrderUpdated -> {
                     if(it.count == 0) {
                         buttonViewCart.visibility = View.GONE
+                        adViewContainerDetail.visibility = View.VISIBLE
                     } else {
                         buttonViewCart.visibility = View.VISIBLE
+                        adViewContainerDetail.visibility = View.GONE
                     }
                 }
             }
@@ -113,16 +116,6 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
         productDetailViewModel.load(productId)
         productDetailViewModel.loadOrders()
-    }
-
-    private fun setBasketQuantity(value: String) {
-        textViewOrderBadge.text = value
-
-        if(value == "0") {
-            buttonViewCart.visibility = View.GONE
-        } else {
-            buttonViewCart.visibility = View.VISIBLE
-        }
     }
 
     private fun setToolbar() {
