@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.ads.*
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
@@ -17,18 +18,15 @@ import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListener
 import com.gayyedfam.grainsmartkarga.ui.productdetail.ProductDetailFragmentArgs.Companion.fromBundle
 import com.gayyedfam.grainsmartkarga.ui.productdetail.adapters.ProductsDetailListAdapter
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_product_detail.*
-import kotlinx.android.synthetic.main.fragment_product_detail.fabBasket
 import kotlinx.android.synthetic.main.fragment_product_detail.progressBar
-import kotlinx.android.synthetic.main.fragment_product_detail.textViewOrderBadge
 
 @AndroidEntryPoint
 class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
+
+    private lateinit var adView: AdView
 
     private val productId by lazy {
         fromBundle(requireArguments()).productId
@@ -57,20 +55,21 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         return inflater.inflate(R.layout.fragment_product_detail, container, false)
     }
 
+    override fun onDestroy() {
+        adView.destroy()
+        super.onDestroy()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setToolbar()
         setupList()
 
-        val adRequest = AdRequest.Builder().build()
-        val adView = AdView(context)
-        adView.adSize = AdSize.SMART_BANNER
-        adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
+        adView = AdView(context, BuildConfig.FB_BANNER_PLACEMENT_ID, AdSize.BANNER_HEIGHT_50)
 
         adViewContainerDetail.addView(adView)
-
-        adView.loadAd(adRequest)
+        adView.loadAd()
 
         buttonViewCart.setOnClickListener {
             val direction = ProductDetailFragmentDirections.actionProductDetailFragmentToCartFragment()

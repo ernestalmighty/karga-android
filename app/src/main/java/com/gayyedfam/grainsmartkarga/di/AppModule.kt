@@ -22,7 +22,9 @@ class AppModule {
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(context,
-            AppDatabase::class.java, "karga-grainsmart.db").build()
+            AppDatabase::class.java, "karga-grainsmart.db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

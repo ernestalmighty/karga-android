@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.facebook.ads.*
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.Product
@@ -20,7 +21,6 @@ import com.gayyedfam.grainsmartkarga.data.model.Store
 import com.gayyedfam.grainsmartkarga.ui.home.adapters.ProductsGridAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
 import com.gayyedfam.grainsmartkarga.utils.isNetworkConnected
-import com.google.android.gms.ads.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -31,7 +31,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private var isShowingDialog = false
-    private val adRequest = AdRequest.Builder().build()
+    private lateinit var adView: AdView
 
     private val storeStateObserver = Observer<StoreState> {
         when(it) {
@@ -176,51 +176,34 @@ class HomeFragment : Fragment(), ProductsItemListener {
         homeViewModel.onResume()
     }
 
+    override fun onDestroy() {
+        adView.destroy()
+        super.onDestroy()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adView = AdView(context)
-        adView.adSize = AdSize.SMART_BANNER
-        adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
-        adView.adListener = object : AdListener() {
-            override fun onAdImpression() {
-                super.onAdImpression()
-            }
-
-            override fun onAdLeftApplication() {
-                super.onAdLeftApplication()
-            }
-
-            override fun onAdClicked() {
-                super.onAdClicked()
-            }
-
-            override fun onAdFailedToLoad(p0: Int) {
-                super.onAdFailedToLoad(p0)
-            }
-
-            override fun onAdFailedToLoad(p0: LoadAdError?) {
-                super.onAdFailedToLoad(p0)
-                groupCart.visibility = View.VISIBLE
-            }
-
-            override fun onAdClosed() {
-                super.onAdClosed()
-            }
-
-            override fun onAdOpened() {
-                super.onAdOpened()
-            }
-
-            override fun onAdLoaded() {
-                super.onAdLoaded()
-                groupCart.visibility = View.VISIBLE
-            }
-        }
+        adView = AdView(context, BuildConfig.FB_BANNER_PLACEMENT_ID, AdSize.BANNER_HEIGHT_50)
 
         adViewContainer.addView(adView)
+        adView.loadAd()
 
-        adView.loadAd(adRequest)
+        adView.setAdListener(object : AdListener {
+            override fun onAdClicked(p0: Ad?) {
+            }
+
+            override fun onError(p0: Ad?, p1: AdError?) {
+                adViewContainer.visibility = View.GONE
+            }
+
+            override fun onAdLoaded(p0: Ad?) {
+                adViewContainer.visibility = View.VISIBLE
+            }
+
+            override fun onLoggingImpression(p0: Ad?) {
+            }
+        })
 
         homeViewModel.homeStateLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {

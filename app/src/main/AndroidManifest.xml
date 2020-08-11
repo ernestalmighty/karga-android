@@ -13,9 +13,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_drawing" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
         <provider android:authorities="com.facebook.app.FacebookContentProvider{1694922733995611}"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true"/>
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

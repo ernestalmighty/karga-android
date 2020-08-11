@@ -8,21 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.share.Sharer
-import com.facebook.share.model.ShareLinkContent
-import com.facebook.share.model.ShareMessengerActionButton
-import com.facebook.share.model.ShareMessengerMediaTemplateContent
-import com.facebook.share.widget.MessageDialog
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.ui.components.adapters.OrderListAdapter
@@ -111,7 +102,6 @@ class CartFragment : Fragment() {
                 }
                 is OrderBasketState.OrdersSummarized -> {
                     textViewPurchaseTotal.text = it.totalAmount
-                    textViewDeliveryFee.text = it.deliveryFee
 
                     orderListAdapter.list = it.list
                     orderListAdapter.notifyDataSetChanged()

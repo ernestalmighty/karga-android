@@ -178,6 +178,17 @@
             app:layout_constraintBottom_toBottomOf="@+id/textViewPurchaseTotal"/>
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewNote"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:textSize="10sp"
+            android:text="*The delivery fee will be set upon confirmation of order."
+            android:textStyle="italic"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="@+id/cardViewList"
+            app:layout_constraintBottom_toTopOf="@+id/cardViewCart"/>
+
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textViewPurchaseTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -239,9 +250,8 @@
             app:constraint_referenced_ids="
             textViewPurchaseTotal,
             textViewTotalLabel,
-            textViewDeliveryFee,
-            textViewDeliveryLabel,
             cardViewCart,
+            textViewNote,
             cardViewList"/>
 
         <com.google.android.material.textview.MaterialTextView

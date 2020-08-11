@@ -16,7 +16,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlin.math.roundToInt
 
 /**
  * Created by emgayyed on 24/7/20.
@@ -67,57 +66,25 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
     }
 
     fun orderSummary(orderList: List<ProductOrder>) {
-        disposable.add(
-        getAdditionalFeeUseCase()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { deliveryFee ->
+        val totalAmount = orderList.map { order ->
+            order.price
+        }.sum()
 
-                    getStoreUseDistanceUseCase()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            { distance ->
-                                val kilometerDistance = (distance / 1000).roundToInt()
-                                var additionalFee = 0
-                                if(deliveryFee.isEnabled) {
-                                    if(kilometerDistance > deliveryFee.freeRadius) {
-                                        val extraDistance = (kilometerDistance - deliveryFee.freeRadius)
-                                        additionalFee = extraDistance * deliveryFee.deliveryExtra
-                                    }
-                                }
+        val result = orderList.groupBy { order ->
+            order.productDetailVariantId
+        }
 
-                                val totalAmount = orderList.map { order ->
-                                    order.price
-                                }.sum()
-
-                                val result = orderList.groupBy { order ->
-                                    order.productDetailVariantId
-                                }
-
-                                val orderGroups = mutableListOf<OrderGroup>()
-                                result.entries.map {(_, group) ->
-                                    val orderGroup = OrderGroup(
-                                        group[0].productDetailVariantId,
-                                        group
-                                    )
-                                    orderGroups.add(orderGroup)
-                                }
-
-                                this.orderGroup = orderGroups
-                                orderBasketState.value = OrderBasketState.OrdersSummarized((totalAmount + additionalFee).toString(), additionalFee.toString(), orderGroups)
-                            },
-                            {
-                                orderBasketState.value = OrderBasketState.Nothing
-                            }
-                        )
-                },
-                {
-                    orderBasketState.value = OrderBasketState.Nothing
-                }
+        val orderGroups = mutableListOf<OrderGroup>()
+        result.entries.map {(_, group) ->
+            val orderGroup = OrderGroup(
+                group[0].productDetailVariantId,
+                group
             )
-        )
+            orderGroups.add(orderGroup)
+        }
+
+        this.orderGroup = orderGroups
+        orderBasketState.value = OrderBasketState.OrdersSummarized(totalAmount.toString(), orderGroups)
     }
 
     private fun removeOrders() {

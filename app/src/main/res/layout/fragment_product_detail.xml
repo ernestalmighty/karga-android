@@ -116,7 +116,7 @@
                 android:layout_margin="12dp"
                 android:text="View Cart"
                 android:textSize="12sp"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/fabBasket"

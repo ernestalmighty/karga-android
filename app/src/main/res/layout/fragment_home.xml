@@ -207,12 +207,12 @@
             android:id="@+id/groupCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             app:constraint_referenced_ids="fabBasket,textViewOrderBadge"/>
 
         <RelativeLayout
             android:id="@+id/adViewContainer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
