@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -18,12 +19,16 @@ import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.ui.components.adapters.OrderListAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
+import com.gayyedfam.grainsmartkarga.ui.main.MainActivity
 import com.gayyedfam.grainsmartkarga.ui.orderlist.OrderListViewModel
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
+import com.gayyedfam.grainsmartkarga.utils.LocationUtil
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -105,6 +110,20 @@ class CartFragment : Fragment() {
 
                     orderListAdapter.list = it.list
                     orderListAdapter.notifyDataSetChanged()
+
+                    buttonProceed.visibility = View.VISIBLE
+
+                    if(it.deliveryFee == "0.0" || it.deliveryFee == "0") {
+                        textViewDeliveryLabel.visibility = View.GONE
+                        textViewDeliveryFee.visibility = View.GONE
+                        textViewNote.visibility = View.VISIBLE
+                    } else {
+                        textViewNote.visibility = View.GONE
+                        textViewDeliveryLabel.visibility = View.VISIBLE
+                        textViewDeliveryFee.visibility = View.VISIBLE
+
+                        textViewDeliveryFee.text = it.deliveryFee
+                    }
                 }
                 is OrderBasketState.OrdersEmpty -> {
                     groupOrders.visibility = View.GONE

@@ -10,7 +10,7 @@ import javax.inject.Inject
  * Created by emgayyed on 1/8/20.
  */
 class SaveOrdersUseCase @Inject constructor(private val productsRepository: ProductsRepository) {
-    operator fun invoke(profile: Profile, list: List<OrderGroup>): Single<String> {
-        return productsRepository.postOrders(profile, list)
+    operator fun invoke(profile: Profile, list: List<OrderGroup>, total: String, deliveryFee: String): Single<String> {
+        return productsRepository.postOrders(profile, list, total, deliveryFee)
     }
 }

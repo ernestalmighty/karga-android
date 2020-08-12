@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Created by emgayyed on 10/8/20.
  */
-class GetStoreUseDistanceUseCase @Inject constructor(val productsRepository: ProductsRepository) {
+class GetStoreUserDistanceUseCase @Inject constructor(val productsRepository: ProductsRepository) {
     operator fun invoke(): Single<Double> {
         return productsRepository.getDistanceDeviceStore()
     }

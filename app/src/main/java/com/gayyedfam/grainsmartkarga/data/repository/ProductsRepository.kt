@@ -152,7 +152,7 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
         }
     }
 
-    fun postOrders(profile: Profile, list: List<OrderGroup>): Single<String> {
+    fun postOrders(profile: Profile, list: List<OrderGroup>, totalAmount: String, deliveryFee: String): Single<String> {
         val currentTime = Calendar.getInstance().time
 
         val dateWithTimeFormat = SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault())
@@ -160,8 +160,6 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate = dateFormat.format(currentTime)
-
-        var totalAmount = 0F
 
         var orderDetails: StringBuilder = java.lang.StringBuilder()
 
@@ -178,8 +176,6 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
                 val productAmount = it.list.map { order ->
                     order.price
                 }.sum()
-
-                totalAmount += productAmount
 
                 val productOrder = it.list[0]
 
@@ -225,6 +221,7 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
 
             val totalMap = hashMapOf(
                 "Total Amount" to totalAmount,
+                "Delivery Fee" to deliveryFee,
                 "Date" to currentTime.toString(),
                 "Client Name" to profile.name,
                 "Contact" to profile.contact,
@@ -241,7 +238,7 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
                 .addOnSuccessListener {
                     val orderHistory = OrderHistory(
                         ref.id,
-                        totalAmount,
+                        totalAmount.toFloat(),
                         formattedTime
                     )
 

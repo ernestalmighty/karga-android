@@ -194,11 +194,9 @@ class HomeFragment : Fragment(), ProductsItemListener {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                adViewContainer.visibility = View.GONE
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                adViewContainer.visibility = View.VISIBLE
             }
 
             override fun onLoggingImpression(p0: Ad?) {

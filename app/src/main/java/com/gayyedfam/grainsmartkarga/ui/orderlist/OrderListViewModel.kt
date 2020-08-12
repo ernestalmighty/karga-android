@@ -1,21 +1,19 @@
 package com.gayyedfam.grainsmartkarga.ui.orderlist
 
-import android.location.Location
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.room.EmptyResultSetException
 import com.gayyedfam.grainsmartkarga.data.model.OrderGroup
 import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
 import com.gayyedfam.grainsmartkarga.data.model.Profile
 import com.gayyedfam.grainsmartkarga.domain.usecase.*
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
-import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.roundToInt
 
 /**
  * Created by emgayyed on 24/7/20.
@@ -27,13 +25,15 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                                                       val getUserStoreUseCase: GetUserStoreUseCase,
                                                       val getAdditionalFeeUseCase: GetAdditionalFeeUseCase,
                                                       val deleteOrdersUseCase: DeleteOrdersUseCase,
-                                                      val getStoreUseDistanceUseCase: GetStoreUseDistanceUseCase) : ViewModel() {
+                                                      val getStoreUserDistanceUseCase: GetStoreUserDistanceUseCase) : ViewModel() {
 
     var orderBasketState = MutableLiveData<OrderBasketState>()
     var profileState = MutableLiveData<ProfileViewState>()
     private val disposable = CompositeDisposable()
     private var profile: Profile ?= null
     private var orderGroup: List<OrderGroup> = listOf()
+    private var totalAmount: Float = 0F
+    private var deliveryFee: Int = 0
 
     fun load() {
         disposable.add(
@@ -66,16 +66,61 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
     }
 
     fun orderSummary(orderList: List<ProductOrder>) {
+        disposable.add(
+            getAdditionalFeeUseCase()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { deliveryFee ->
+                        if(deliveryFee.isEnabled) {
+                            getStoreUserDistanceUseCase()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                    { distance ->
+                                        var additionalFee = 0
+                                        val distanceKm = (distance / 1000).roundToInt()
+                                        if(distanceKm > deliveryFee.freeRadius) {
+                                            val payableDistance = distanceKm - deliveryFee.freeRadius
+                                            additionalFee = payableDistance * deliveryFee.deliveryExtra
+                                        }
+
+                                        calculateWithAdditionalFee(orderList, additionalFee)
+                                    },
+                                    {
+                                        if(it is EmptyResultSetException) {
+                                            calculateWithAdditionalFee(orderList, 0)
+                                        } else {
+                                            orderBasketState.value = OrderBasketState.Nothing
+                                        }
+                                    }
+                                )
+                        } else {
+                            calculateWithAdditionalFee(orderList, 0)
+                        }
+                    },
+                    {
+                        orderBasketState.value = OrderBasketState.Nothing
+                    }
+                )
+
+        )
+    }
+
+    private fun calculateWithAdditionalFee(
+        orderList: List<ProductOrder>,
+        additionalFee: Int
+    ) {
         val totalAmount = orderList.map { order ->
             order.price
-        }.sum()
+        }.sum() + additionalFee
 
         val result = orderList.groupBy { order ->
             order.productDetailVariantId
         }
 
         val orderGroups = mutableListOf<OrderGroup>()
-        result.entries.map {(_, group) ->
+        result.entries.map { (_, group) ->
             val orderGroup = OrderGroup(
                 group[0].productDetailVariantId,
                 group
@@ -84,7 +129,14 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
         }
 
         this.orderGroup = orderGroups
-        orderBasketState.value = OrderBasketState.OrdersSummarized(totalAmount.toString(), orderGroups)
+        this.totalAmount = totalAmount
+        this.deliveryFee = additionalFee
+
+        orderBasketState.value = OrderBasketState.OrdersSummarized(
+            totalAmount.toString(),
+            additionalFee.toString(),
+            orderGroups
+        )
     }
 
     private fun removeOrders() {
@@ -123,7 +175,7 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
 
     fun orderConfirmation() {
         profile?.let {
-            saveOrdersUseCase(it, orderGroup)
+            saveOrdersUseCase(it, orderGroup, totalAmount.toString(), deliveryFee.toString())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {

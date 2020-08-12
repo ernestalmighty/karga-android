@@ -4,18 +4,16 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.ui.main.MainActivity
-import com.gayyedfam.grainsmartkarga.ui.main.MainViewModel
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -104,7 +102,7 @@ class SplashActivity : AppCompatActivity() {
                             startActivity(Intent(this, MainActivity::class.java))
                             finish();
                         }
-                    }, 5000)
+                    }, 8000)
 
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, looper)
             }
