@@ -7,6 +7,7 @@ import com.facebook.ads.AdSettings
 import com.facebook.ads.AudienceNetworkAds
 import com.gayyedfam.grainsmartkarga.BuildConfig.DEBUG
 import com.gayyedfam.grainsmartkarga.utils.AudienceNetworkInitializeHelper
+import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.HiltAndroidApp
 
 
@@ -18,15 +19,13 @@ class GrainsmartKargaApp: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Bugfender.init(this, "clSABi1yqEh5akBvuRLwkuPzwJlETbkk", true)
-        Bugfender.enableCrashReporting()
-        Bugfender.enableUIEventLogging(this)
-        Bugfender.enableLogcatLogging()
-
         FacebookSdk.setApplicationId(this.getString(R.string.facebook_app_id))
         FacebookSdk.sdkInitialize(this)
         FacebookSdk.setAutoLogAppEventsEnabled(true)
 
         AudienceNetworkInitializeHelper.initialize(this)
+        // Initialize the SDK
+        Places.initialize(applicationContext, this.getString(R.string.google_api_key))
+        Places.createClient(this)
     }
 }

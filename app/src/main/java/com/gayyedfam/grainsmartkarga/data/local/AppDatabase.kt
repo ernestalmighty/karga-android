@@ -18,7 +18,7 @@ import com.gayyedfam.grainsmartkarga.data.model.*
         ProductDetail::class,
         ProductDetailVariant::class,
         OrderHistory::class,
-        ProductOrder::class], version = 2, exportSchema = false
+        ProductOrder::class], version = 3, exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

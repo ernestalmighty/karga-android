@@ -60,8 +60,12 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
             .subscribe({
                 profile = it
                 profileState.value = ProfileViewState.ProfileLoaded(it)
-            }, {
 
+                load()
+            }, {
+                if(it is EmptyResultSetException) {
+
+                }
             }))
     }
 
@@ -72,32 +76,36 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { deliveryFee ->
-                        if(deliveryFee.isEnabled) {
-                            getStoreUserDistanceUseCase()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    { distance ->
-                                        var additionalFee = 0
-                                        val distanceKm = (distance / 1000).roundToInt()
-                                        if(distanceKm > deliveryFee.freeRadius) {
-                                            val payableDistance = distanceKm - deliveryFee.freeRadius
-                                            additionalFee = payableDistance * deliveryFee.deliveryExtra
-                                        }
+                        profile?.let {
+                            if(deliveryFee.isEnabled) {
+                                getStoreUserDistanceUseCase()
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(
+                                        { distance ->
+                                            var additionalFee = 0
+                                            val distanceKm = (distance / 1000).roundToInt()
+                                            if(distanceKm > deliveryFee.freeRadius) {
+                                                val payableDistance = distanceKm - deliveryFee.freeRadius
+                                                additionalFee = payableDistance * deliveryFee.deliveryExtra
+                                            }
 
-                                        calculateWithAdditionalFee(orderList, additionalFee)
-                                    },
-                                    {
-                                        if(it is EmptyResultSetException) {
-                                            calculateWithAdditionalFee(orderList, 0)
-                                        } else {
-                                            orderBasketState.value = OrderBasketState.Nothing
+                                            calculateWithAdditionalFee(orderList, additionalFee)
+                                        },
+                                        {
+                                            if(it is EmptyResultSetException) {
+                                                calculateWithAdditionalFee(orderList, 0)
+                                            } else {
+                                                orderBasketState.value = OrderBasketState.Nothing
+                                            }
                                         }
-                                    }
-                                )
-                        } else {
+                                    )
+                            } else {
+                                calculateWithAdditionalFee(orderList, 0)
+                            }
+                        } ?: {
                             calculateWithAdditionalFee(orderList, 0)
-                        }
+                        }()
                     },
                     {
                         orderBasketState.value = OrderBasketState.Nothing

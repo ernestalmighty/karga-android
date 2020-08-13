@@ -1,7 +1,8 @@
 package com.gayyedfam.grainsmartkarga.ui.profile
 
 import android.annotation.SuppressLint
-import android.location.Geocoder
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -12,7 +13,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.gayyedfam.grainsmartkarga.R
-import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -21,25 +24,9 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
-    lateinit var rootView: View
+    private lateinit var rootView: View
+    private val LOCATION_REQUEST = 1002
     private val profileViewModel: ProfileViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        Places.initialize(requireContext(), "AIzaSyAC_g7co2iQIbYV1TG00F4t2io6AxmMAvY")
-
-        // Create a new PlacesClient instance
-        val placesClient = Places.createClient(requireContext())
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +37,30 @@ class ProfileFragment : Fragment() {
         return rootView
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
+            data?.let {
+                val place = Autocomplete.getPlaceFromIntent(it)
+                val name = place.name
+                val latLang = place.latLng
+
+                val addressComponents = place.addressComponents
+                val clientAddress = StringBuilder()
+                addressComponents?.let { component ->
+                    component.asList().forEach { address ->
+                        clientAddress.append(address.name)
+                        clientAddress.append(" ")
+                    }
+                }
+
+                textEditAddress.setText(clientAddress.toString())
+                textEditDetailAddress.setText(name)
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -57,7 +68,19 @@ class ProfileFragment : Fragment() {
             findNavController().popBackStack()
         }
 
+        textEditAddress.setOnClickListener {
+            val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS_COMPONENTS)
+
+            context?.let {
+                val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
+                    .setCountries(listOf("PH","SG"))
+                    .build(it)
+                startActivityForResult(intent, LOCATION_REQUEST)
+            }
+        }
+
         buttonSave.setOnClickListener {
+            val detailAddress = textEditDetailAddress.text.toString()
             val address = textEditAddress.text.toString()
             val name = textEditName.text.toString()
             val contact = textEditContact.text.toString()
@@ -66,9 +89,16 @@ class ProfileFragment : Fragment() {
 
             if(address.isBlank()) {
                 isValid = false
-                textInputAddress.error = "Please provide delivery address"
+                textInputAddress.error = "Please provide your address"
             } else {
                 textInputAddress.error = ""
+            }
+
+            if(detailAddress.isBlank()) {
+                isValid = false
+                textEditDetailAddress.error = "Please provide a detailed address"
+            } else {
+                textEditDetailAddress.error = ""
             }
 
             if(name.isBlank()) {
@@ -86,7 +116,7 @@ class ProfileFragment : Fragment() {
             }
 
             if(isValid) {
-                profileViewModel.save(name, contact, address, getDeviceId(), textEditInstructions.text.toString())
+                profileViewModel.save(name, contact, address, detailAddress, getDeviceId(), textEditInstructions.text.toString())
             }
         }
 
@@ -99,35 +129,12 @@ class ProfileFragment : Fragment() {
                 is ProfileViewState.ProfileLoaded -> {
                     textEditName.setText(it.profile.name)
                     textEditContact.setText(it.profile.contact)
-                    textEditAddress.setText(it.profile.address)
+                    textEditAddress.setText(it.profile.address1)
+                    textEditDetailAddress.setText(it.profile.address2)
                     textEditInstructions.setText(it.profile.deliveryInstruction)
                 }
                 is ProfileViewState.DeviceAddressLoaded -> {
-//                    val geoCoder = Geocoder(context)
-//                    val address = geoCoder.getFromLocation(it.deviceLocation.locationLat, it.deviceLocation.locationLon, 1)
-//
-//                    val firstAddress = address.first()
-//
-//                    val deviceAddress = StringBuilder()
-//                        .append(firstAddress.subThoroughfare)
-//                        .append(", ")
-//                        .append(firstAddress.adminArea)
-//                        .append(", ")
-//                        .append(firstAddress.countryCode)
-//                        .append(", ")
-//                        .append(firstAddress.countryName)
-//                        .append(", ")
-//                        .append(firstAddress.featureName)
-//                        .append(", ")
-//                        .append(firstAddress.locale)
-//                        .append(", ")
-//                        .append(firstAddress.locality)
-//                        .append(", ")
-//                        .append(firstAddress.premises)
-//                        .append(", ")
-//                        .append(firstAddress.subAdminArea)
 
-//                    textEditAddress.setText(deviceAddress.toString())
                 }
             }
         })

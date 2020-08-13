@@ -225,7 +225,8 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
                 "Date" to currentTime.toString(),
                 "Client Name" to profile.name,
                 "Contact" to profile.contact,
-                "Address" to profile.address,
+                "Address 1" to profile.address1,
+                "Address 2" to profile.address2,
                 "Delivery Instructions" to profile.deliveryInstruction,
                 "Status" to "unconfirmed"
             )

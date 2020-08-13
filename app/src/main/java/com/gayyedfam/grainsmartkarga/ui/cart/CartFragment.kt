@@ -29,6 +29,10 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.TypeFilter
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,6 +65,8 @@ class CartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         hideKeyboard()
+
+        orderListViewModel.getProfile()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,8 +101,6 @@ class CartFragment : Fragment() {
             orderListViewModel.orderHistory()
         }
 
-        orderListViewModel.getProfile()
-        orderListViewModel.load()
         orderListViewModel.orderBasketState.observe(viewLifecycleOwner, Observer {
             progressBar.visibility = View.GONE
             when(it) {
@@ -220,7 +224,7 @@ class CartFragment : Fragment() {
         orderListViewModel.profileState.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ProfileViewState.ProfileLoaded -> {
-                    valueDeliveryAddress.text = it.profile.address
+                    valueDeliveryAddress.text = "${it.profile.address1} ${it.profile.address2}"
                 }
             }
         })

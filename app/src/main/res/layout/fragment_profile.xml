@@ -95,7 +95,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:endIconMode="custom"
-                    app:helperText="Address"
+                    app:helperText="Address Line 1 (General area)"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -104,6 +104,27 @@
                         android:id="@+id/textEditAddress"
                         android:layout_width="match_parent"
                         android:layout_height="80dp"
+                        android:inputType="textPostalAddress|textMultiLine"
+                        android:focusable="false"
+                        android:textColor="@color/icon_toolbar_color" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputDetailAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:endIconMode="custom"
+                    app:helperText="Address Line 2 (House no, Lot no, Street etc)"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textInputAddress">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/textEditDetailAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
                         android:inputType="textPostalAddress|textMultiLine"
                         android:textColor="@color/icon_toolbar_color" />
 
@@ -117,7 +138,7 @@
                     app:helperText="Name"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textInputAddress">
+                    app:layout_constraintTop_toBottomOf="@+id/textInputDetailAddress">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/textEditName"
