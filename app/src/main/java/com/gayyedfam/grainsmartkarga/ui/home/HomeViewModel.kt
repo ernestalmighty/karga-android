@@ -197,7 +197,7 @@ class HomeViewModel @ViewModelInject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    basketStateLiveData.value = OrderBasketState.OrdersLoaded(it)
+                    basketStateLiveData.value = OrderBasketState.OrdersBasketLoaded(it)
                 }, {
                     it.message?.let { message ->
                         basketStateLiveData.value = OrderBasketState.OrdersLoadError(message)

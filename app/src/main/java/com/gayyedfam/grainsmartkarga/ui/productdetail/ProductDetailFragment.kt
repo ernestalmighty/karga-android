@@ -10,7 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.ads.*
+import com.facebook.ads.AdSize
+import com.facebook.ads.AdView
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
@@ -19,9 +20,7 @@ import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListen
 import com.gayyedfam.grainsmartkarga.ui.productdetail.ProductDetailFragmentArgs.Companion.fromBundle
 import com.gayyedfam.grainsmartkarga.ui.productdetail.adapters.ProductsDetailListAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_product_detail.*
-import kotlinx.android.synthetic.main.fragment_product_detail.progressBar
 
 @AndroidEntryPoint
 class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
@@ -98,16 +97,14 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
         productDetailViewModel.orderBasketState.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is OrderBasketState.OrdersLoaded -> {
+                is OrderBasketState.OrdersBasketLoaded -> {
                     productDetailAdapter.ordersList = it.list
                 }
                 is OrderBasketState.OrderUpdated -> {
                     if(it.count == 0) {
                         buttonViewCart.visibility = View.GONE
-                        adViewContainerDetail.visibility = View.VISIBLE
                     } else {
                         buttonViewCart.visibility = View.VISIBLE
-                        adViewContainerDetail.visibility = View.GONE
                     }
                 }
             }

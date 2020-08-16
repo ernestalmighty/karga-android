@@ -425,14 +425,13 @@ class ProductsRepository @Inject constructor(private val productDAO: ProductDAO,
 
     fun getDistanceDeviceStore(): Single<Double> {
         return Single.create<Double> {
-
-            val deviceLocation = profileDAO.getDeviceLocation().blockingGet()
+            val profile = profileDAO.getProfile().blockingGet()
             val storeLocation = productDAO.getStore().blockingGet()
 
             val results = FloatArray(1)
             Location.distanceBetween(storeLocation.lat,
                 storeLocation.lon,
-            deviceLocation.locationLat, deviceLocation.locationLon, results)
+                profile.addressLat, profile.addressLong, results)
 
             it.onSuccess(results[0].toDouble())
         }

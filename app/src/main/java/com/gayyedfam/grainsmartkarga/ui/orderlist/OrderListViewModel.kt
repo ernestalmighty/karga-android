@@ -32,6 +32,7 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
     private val disposable = CompositeDisposable()
     private var profile: Profile ?= null
     private var orderGroup: List<OrderGroup> = listOf()
+    private var orderList: List<ProductOrder> = listOf()
     private var totalAmount: Float = 0F
     private var deliveryFee: Int = 0
 
@@ -44,7 +45,22 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                     if(it.isEmpty()) {
                         orderBasketState.value = OrderBasketState.OrdersEmpty
                     } else {
-                        orderBasketState.value = OrderBasketState.OrdersLoaded(it)
+                        this.orderList = it
+                        val result = it.groupBy { order ->
+                            order.productDetailVariantId
+                        }
+
+                        val orderGroups = mutableListOf<OrderGroup>()
+                        result.entries.map { (_, group) ->
+                            val orderGroup = OrderGroup(
+                                group[0].productDetailVariantId,
+                                group
+                            )
+                            orderGroups.add(orderGroup)
+                        }
+
+                        this.orderGroup = orderGroups
+                        orderBasketState.value = OrderBasketState.OrdersLoaded(orderGroups)
                     }
 
                 }
@@ -57,19 +73,17 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
         getProfileUseCase()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doFinally {
+                load()
+            }
             .subscribe({
                 profile = it
                 profileState.value = ProfileViewState.ProfileLoaded(it)
-
-                load()
             }, {
-                if(it is EmptyResultSetException) {
-
-                }
             }))
     }
 
-    fun orderSummary(orderList: List<ProductOrder>) {
+    fun orderSummary() {
         disposable.add(
             getAdditionalFeeUseCase()
                 .subscribeOn(Schedulers.io())
@@ -90,21 +104,21 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
                                                 additionalFee = payableDistance * deliveryFee.deliveryExtra
                                             }
 
-                                            calculateWithAdditionalFee(orderList, additionalFee)
+                                            calculateWithAdditionalFee(additionalFee)
                                         },
                                         {
                                             if(it is EmptyResultSetException) {
-                                                calculateWithAdditionalFee(orderList, 0)
+                                                calculateWithAdditionalFee(0)
                                             } else {
                                                 orderBasketState.value = OrderBasketState.Nothing
                                             }
                                         }
                                     )
                             } else {
-                                calculateWithAdditionalFee(orderList, 0)
+                                calculateWithAdditionalFee(0)
                             }
                         } ?: {
-                            calculateWithAdditionalFee(orderList, 0)
+                            calculateWithAdditionalFee(0)
                         }()
                     },
                     {
@@ -116,34 +130,17 @@ class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetO
     }
 
     private fun calculateWithAdditionalFee(
-        orderList: List<ProductOrder>,
         additionalFee: Int
     ) {
         val totalAmount = orderList.map { order ->
             order.price
         }.sum() + additionalFee
-
-        val result = orderList.groupBy { order ->
-            order.productDetailVariantId
-        }
-
-        val orderGroups = mutableListOf<OrderGroup>()
-        result.entries.map { (_, group) ->
-            val orderGroup = OrderGroup(
-                group[0].productDetailVariantId,
-                group
-            )
-            orderGroups.add(orderGroup)
-        }
-
-        this.orderGroup = orderGroups
-        this.totalAmount = totalAmount
         this.deliveryFee = additionalFee
+        this.totalAmount = totalAmount
 
         orderBasketState.value = OrderBasketState.OrdersSummarized(
             totalAmount.toString(),
-            additionalFee.toString(),
-            orderGroups
+            additionalFee.toString()
         )
     }
 

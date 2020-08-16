@@ -203,7 +203,7 @@
             android:id="@+id/textViewDeliveryLabel"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:text="Delivery Fee"
             android:gravity="center"
             android:visibility="gone"
@@ -228,7 +228,7 @@
             android:id="@+id/cardViewCart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cardElevation="10dp"
+            app:cardElevation="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -237,7 +237,7 @@
                 android:id="@+id/buttonProceed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
+                android:layout_margin="8dp"
                 android:text="PROCEED"
                 android:textSize="12sp" />
         </com.google.android.material.card.MaterialCardView>

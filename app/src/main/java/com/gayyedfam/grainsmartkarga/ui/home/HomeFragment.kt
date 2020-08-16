@@ -194,9 +194,15 @@ class HomeFragment : Fragment(), ProductsItemListener {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
+                groupCart?.let {
+                    groupCart.visibility = View.VISIBLE
+                }
             }
 
             override fun onAdLoaded(p0: Ad?) {
+                groupCart?.let {
+                    groupCart.visibility = View.VISIBLE
+                }
             }
 
             override fun onLoggingImpression(p0: Ad?) {
@@ -225,7 +231,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
         homeViewModel.basketStateLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is OrderBasketState.OrdersLoaded -> {
+                is OrderBasketState.OrdersBasketLoaded -> {
                     setBasketQuantity(it.list.size.toString())
                 }
                 is OrderBasketState.OrdersLoadError -> {

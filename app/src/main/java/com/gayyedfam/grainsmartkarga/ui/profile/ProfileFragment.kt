@@ -55,6 +55,8 @@ class ProfileFragment : Fragment() {
 
                 textEditAddress.setText(clientAddress.toString())
                 textEditDetailAddress.setText(name)
+
+                profileViewModel.locationSelected(latLang)
             }
         }
 
@@ -72,7 +74,7 @@ class ProfileFragment : Fragment() {
             val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS_COMPONENTS)
 
             context?.let {
-                val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
+                val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
                     .setCountries(listOf("PH","SG"))
                     .build(it)
                 startActivityForResult(intent, LOCATION_REQUEST)
@@ -96,9 +98,9 @@ class ProfileFragment : Fragment() {
 
             if(detailAddress.isBlank()) {
                 isValid = false
-                textEditDetailAddress.error = "Please provide a detailed address"
+                textInputDetailAddress.error = "Please provide a detailed address"
             } else {
-                textEditDetailAddress.error = ""
+                textInputDetailAddress.error = ""
             }
 
             if(name.isBlank()) {

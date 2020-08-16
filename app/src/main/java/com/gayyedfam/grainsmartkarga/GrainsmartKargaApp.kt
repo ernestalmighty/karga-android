@@ -1,13 +1,11 @@
 package com.gayyedfam.grainsmartkarga
 
 import android.app.Application
-import com.bugfender.sdk.Bugfender
 import com.facebook.FacebookSdk
-import com.facebook.ads.AdSettings
-import com.facebook.ads.AudienceNetworkAds
-import com.gayyedfam.grainsmartkarga.BuildConfig.DEBUG
 import com.gayyedfam.grainsmartkarga.utils.AudienceNetworkInitializeHelper
 import com.google.android.libraries.places.api.Places
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import dagger.hilt.android.HiltAndroidApp
 
 
@@ -25,7 +23,7 @@ class GrainsmartKargaApp: Application() {
 
         AudienceNetworkInitializeHelper.initialize(this)
         // Initialize the SDK
-        Places.initialize(applicationContext, this.getString(R.string.google_api_key))
+        Places.initialize(applicationContext, "AIzaSyBVCx7vWCTkLAGHf3w4nsOZF78VZyuMVhw")
         Places.createClient(this)
     }
 }

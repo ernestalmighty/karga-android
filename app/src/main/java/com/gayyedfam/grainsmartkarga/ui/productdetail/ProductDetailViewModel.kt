@@ -59,7 +59,7 @@ class ProductDetailViewModel @ViewModelInject constructor(
             }
             .subscribe({
                 initialOrderCount = it.size
-                orderBasketState.value = OrderBasketState.OrdersLoaded(it)
+                orderBasketState.value = OrderBasketState.OrdersBasketLoaded(it)
             }, {
 
             })

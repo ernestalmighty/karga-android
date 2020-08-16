@@ -65,14 +65,14 @@ class CartFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         hideKeyboard()
-
-        orderListViewModel.getProfile()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupList()
+        orderListViewModel.getProfile()
+
         imageViewBack.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -107,14 +107,14 @@ class CartFragment : Fragment() {
                 is OrderBasketState.OrdersLoaded -> {
                     groupEmpty.visibility = View.GONE
                     groupOrders.visibility = View.VISIBLE
-                    orderListViewModel.orderSummary(it.list)
-                }
-                is OrderBasketState.OrdersSummarized -> {
-                    textViewPurchaseTotal.text = it.totalAmount
 
                     orderListAdapter.list = it.list
                     orderListAdapter.notifyDataSetChanged()
 
+                    orderListViewModel.orderSummary()
+                }
+                is OrderBasketState.OrdersSummarized -> {
+                    textViewPurchaseTotal.text = it.totalAmount
                     buttonProceed.visibility = View.VISIBLE
 
                     if(it.deliveryFee == "0.0" || it.deliveryFee == "0") {
@@ -224,7 +224,7 @@ class CartFragment : Fragment() {
         orderListViewModel.profileState.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is ProfileViewState.ProfileLoaded -> {
-                    valueDeliveryAddress.text = "${it.profile.address1} ${it.profile.address2}"
+                    valueDeliveryAddress.text = "${it.profile.address2} ${it.profile.address1}"
                 }
             }
         })
