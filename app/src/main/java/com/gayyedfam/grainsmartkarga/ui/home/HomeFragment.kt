@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.facebook.ads.*
 import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.gayyedfam.grainsmartkarga.data.model.Product
@@ -21,9 +20,15 @@ import com.gayyedfam.grainsmartkarga.data.model.Store
 import com.gayyedfam.grainsmartkarga.ui.home.adapters.ProductsGridAdapter
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemListener
 import com.gayyedfam.grainsmartkarga.utils.isNetworkConnected
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_cart.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_home.layoutDeliveryAddress
+import kotlinx.android.synthetic.main.fragment_home.progressBar
 import kotlinx.android.synthetic.main.item_karga_branch.*
 
 @AndroidEntryPoint
@@ -184,30 +189,14 @@ class HomeFragment : Fragment(), ProductsItemListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adView = AdView(context, BuildConfig.FB_BANNER_PLACEMENT_ID, AdSize.BANNER_HEIGHT_50)
+        val adView = AdView(context)
+        adView.adSize = AdSize.SMART_BANNER
+        adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
 
         adViewContainer.addView(adView)
-        adView.loadAd()
 
-        adView.setAdListener(object : AdListener {
-            override fun onAdClicked(p0: Ad?) {
-            }
-
-            override fun onError(p0: Ad?, p1: AdError?) {
-                groupCart?.let {
-                    groupCart.visibility = View.VISIBLE
-                }
-            }
-
-            override fun onAdLoaded(p0: Ad?) {
-                groupCart?.let {
-                    groupCart.visibility = View.VISIBLE
-                }
-            }
-
-            override fun onLoggingImpression(p0: Ad?) {
-            }
-        })
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
 
         homeViewModel.homeStateLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {
