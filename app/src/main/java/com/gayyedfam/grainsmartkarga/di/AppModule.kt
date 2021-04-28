@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.gayyedfam.grainsmartkarga.data.local.AppDatabase
 import com.gayyedfam.grainsmartkarga.data.local.ProductDAO
+import com.gayyedfam.grainsmartkarga.data.local.ProfileDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,12 +22,20 @@ class AppModule {
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(context,
-            AppDatabase::class.java, "karga-grainsmart.db").build()
+            AppDatabase::class.java, "karga-grainsmart.db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     @Singleton
     fun provideProductsDAO(appDatabase: AppDatabase): ProductDAO {
         return appDatabase.productDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileDAO(appDatabase: AppDatabase): ProfileDAO {
+        return appDatabase.profileDao()
     }
 }

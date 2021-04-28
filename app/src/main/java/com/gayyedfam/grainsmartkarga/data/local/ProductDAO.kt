@@ -1,10 +1,7 @@
 package com.gayyedfam.grainsmartkarga.data.local
 
 import androidx.room.*
-import com.gayyedfam.grainsmartkarga.data.model.Product
-import com.gayyedfam.grainsmartkarga.data.model.ProductDetail
-import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
-import com.gayyedfam.grainsmartkarga.data.model.ProductOrder
+import com.gayyedfam.grainsmartkarga.data.model.*
 import io.reactivex.Single
 
 /**
@@ -25,7 +22,7 @@ interface ProductDAO {
     fun insert(productOrder: ProductOrder)
 
     @Query("DELETE FROM productorder WHERE productOrderId = (SELECT productOrderId FROM productorder WHERE productDetailVariantId = :detailVariantId LIMIT 1)")
-    fun deleteFromOrder(detailVariantId: Int)
+    fun deleteFromOrder(detailVariantId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<ProductOrder>)
@@ -33,7 +30,7 @@ interface ProductDAO {
     @Query("SELECT * from product")
     fun getAllProducts(): Single<List<Product>>
 
-    @Query("SELECT * from productdetail WHERE productId = :id")
+    @Query("SELECT * from productdetail WHERE productDetailId = :id")
     fun getProductsDetails(id: Int): Single<List<ProductDetail>>
 
     @Query("SELECT * from productdetailvariant WHERE productDetailId = :id")
@@ -43,12 +40,34 @@ interface ProductDAO {
     fun getAllOrders(): Single<List<ProductOrder>>
 
     @Query("SELECT * from productorder WHERE productDetailVariantId = :detailVariantId")
-    fun getOrdersByProduct(detailVariantId: Int): Single<List<ProductOrder>>
+    fun getOrdersByProduct(detailVariantId: String): Single<List<ProductOrder>>
 
-    @Query("""
-        SELECT * FROM product WHERE productId = 
-        (SELECT productId FROM productdetail WHERE productDetailId = 
-        (SELECT productDetailId FROM productdetailvariant WHERE productDetailVariantId = 
-        (SELECT * FROM productorder WHERE productOrderId = :orderId)))""")
-    fun getProductFromOrderId(orderId: Int): Single<Product>
+    @Transaction
+    @Query("SELECT * FROM Product")
+    fun getProducts(): Single<List<ProductWithDetail>>
+
+    @Transaction
+    @Query("SELECT * FROM ProductDetail WHERE productIdParent = :productId")
+    fun getProductDetails(productId: String): Single<List<ProductDetailWithVariants>>
+
+    @Query("UPDATE productorder SET quantity = quantity + 1 WHERE productDetailVariantId = :id")
+    fun updateProductOrder(id: String)
+
+    @Query("DELETE FROM productorder")
+    fun deleteAllOrders()
+
+    @Query("SELECT * FROM store LIMIT 1")
+    fun getStore(): Single<Store>
+
+    @Query("DELETE FROM store")
+    fun deleteStore()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(store: Store)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(orderHistory: OrderHistory)
+
+    @Query("SELECT * FROM orderhistory ORDER BY date DESC")
+    fun getOrderHistory(): Single<List<OrderHistory>>
 }

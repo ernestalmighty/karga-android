@@ -3,25 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:padding="4dp"
+    android:padding="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/textViewProductVariation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="italic"
-        android:textSize="12sp"
-        android:layout_marginStart="12dp"
+        android:textSize="14sp"
+        android:text="25 kg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textViewStocks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        android:textColor="#FF0000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewProductVariation" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageViewAdd"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        app:srcCompat="@drawable/ic_add"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_add_circle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -30,19 +39,20 @@
         android:id="@+id/textViewQuantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="14dp"
         app:layout_constraintEnd_toStartOf="@+id/imageViewAdd"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:textStyle="bold"
+        android:textSize="16sp"
         android:text="0"/>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageViewRemove"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginEnd="10dp"
-        app:srcCompat="@drawable/ic_remove"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        app:srcCompat="@drawable/ic_remove_circle"
         app:layout_constraintEnd_toStartOf="@+id/textViewQuantity"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

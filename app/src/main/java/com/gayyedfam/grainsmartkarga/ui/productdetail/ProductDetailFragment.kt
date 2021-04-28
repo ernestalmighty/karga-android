@@ -1,28 +1,31 @@
 package com.gayyedfam.grainsmartkarga.ui.productdetail
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.ads.AdSize
+import com.facebook.ads.AdView
+import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
-import com.gayyedfam.grainsmartkarga.data.model.ProductDetail
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.home.listeners.ProductsItemPricingListener
 import com.gayyedfam.grainsmartkarga.ui.productdetail.ProductDetailFragmentArgs.Companion.fromBundle
 import com.gayyedfam.grainsmartkarga.ui.productdetail.adapters.ProductsDetailListAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_product_detail.*
 
 @AndroidEntryPoint
 class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
+
+    private lateinit var adView: AdView
 
     private val productId by lazy {
         fromBundle(requireArguments()).productId
@@ -30,6 +33,14 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
 
     private val productName by lazy {
         fromBundle(requireArguments()).productName
+    }
+
+    private val productType by lazy {
+        fromBundle(requireArguments()).productType
+    }
+
+    private val productImage by lazy {
+        fromBundle(requireArguments()).productImage
     }
 
     private val productDetailViewModel: ProductDetailViewModel by viewModels()
@@ -43,43 +54,61 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         return inflater.inflate(R.layout.fragment_product_detail, container, false)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onDestroy() {
+        adView.destroy()
+        super.onDestroy()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setToolbar()
+        setupList()
 
-        productDetailViewModel.productDetailState.observeForever {
-            when(it) {
+        adView = AdView(context, BuildConfig.FB_BANNER_PLACEMENT_ID, AdSize.BANNER_HEIGHT_50)
+
+        adViewContainerDetail.addView(adView)
+        adView.loadAd()
+
+        buttonViewCart.setOnClickListener {
+            val direction = ProductDetailFragmentDirections.actionProductDetailFragmentToCartFragment()
+            findNavController().navigate(direction)
+        }
+
+
+        productDetailViewModel.productDetailState.observe(viewLifecycleOwner, Observer {
+            when (it) {
                 is ProductDetailState.ProductDetailLoaded -> {
-                    it.productDetails.forEach { detail ->
-                        productDetailViewModel.loadProductDetailVariations(detail.productDetailId)
-                    }
-
-                    setupList(it.productDetails)
+                    productDetailAdapter.list = it.productDetails
+                    productDetailAdapter.notifyDataSetChanged()
                 }
                 is ProductDetailState.ProductDetailLoadError -> {
 
                 }
-            }
-        }
-
-        productDetailViewModel.productDetailVariationState.observeForever {
-            when(it) {
-                is ProductDetailVariationState.ProductDetailVariationLoaded -> {
-                    productDetailAdapter.updateProductDetail(it.productDetailId, it.list)
-                }
-                is ProductDetailVariationState.ProductDetailVariationLoadError -> {
-
+                is ProductDetailState.ProductDetailLoading -> {
+                    if (it.loading) {
+                        progressBar.visibility = View.VISIBLE
+                    } else {
+                        progressBar.visibility = View.GONE
+                    }
                 }
             }
-        }
+        })
 
-        productDetailViewModel.orderBasketState.observeForever {
+        productDetailViewModel.orderBasketState.observe(viewLifecycleOwner, Observer {
             when(it) {
-                is OrderBasketState.OrdersLoaded -> {
+                is OrderBasketState.OrdersBasketLoaded -> {
                     productDetailAdapter.ordersList = it.list
                 }
+                is OrderBasketState.OrderUpdated -> {
+                    if(it.count == 0) {
+                        buttonViewCart.visibility = View.GONE
+                    } else {
+                        buttonViewCart.visibility = View.VISIBLE
+                    }
+                }
             }
-        }
+        })
 
         productDetailViewModel.load(productId)
         productDetailViewModel.loadOrders()
@@ -92,20 +121,16 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
         }
     }
 
-    private fun setupList(list: List<ProductDetail>) {
+    private fun setupList() {
         recyclerViewProductDetails.adapter = productDetailAdapter
         recyclerViewProductDetails.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-
-        productDetailAdapter.list = list
-
-        productDetailAdapter.notifyDataSetChanged()
     }
 
-    override fun onProductVariationOrderAdded(productDetailVariant: ProductDetailVariant) {
-        productDetailViewModel.updateOrderCart(productDetailVariant, true)
+    override fun onProductVariationOrderAdded(productDetailVariant: ProductDetailVariant, productDetailName: String) {
+        productDetailViewModel.updateOrderCart(true, productDetailVariant, productType, productDetailName, productImage)
     }
 
     override fun onProductVariationOrderRemoved(productDetailVariant: ProductDetailVariant) {
-        productDetailViewModel.updateOrderCart(productDetailVariant, false)
+        productDetailViewModel.updateOrderCart(false, productDetailVariant)
     }
 }

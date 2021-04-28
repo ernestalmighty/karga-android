@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+    <item android:drawable="@color/toolbar_background"/>
+    <item
+        android:width="250dp"
+        android:height="80dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/img_app_logo_long"
+            android:mipMap="true"/>
+    </item>
+</layer-list>

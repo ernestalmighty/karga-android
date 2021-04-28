@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="140dp"
         android:layout_margin="10dp"
@@ -17,7 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            android:src="@drawable/ic_rice_card"
             android:layout_gravity="center" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -27,5 +26,21 @@
             android:padding="10dp"
             android:textStyle="bold" />
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textViewComingSoon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="3dp"
+        android:layout_margin="10dp"
+        android:padding="4dp"
+        android:visibility="gone"
+        android:textSize="10sp"
+        android:textStyle="italic"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_red_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Coming soon!"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

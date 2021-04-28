@@ -6,6 +6,6 @@ import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
  * Created by emgayyed on 18/7/20.
  */
 interface ProductsItemPricingListener {
-    fun onProductVariationOrderAdded(productDetailVariant: ProductDetailVariant)
+    fun onProductVariationOrderAdded(productDetailVariant: ProductDetailVariant, productDetailName: String)
     fun onProductVariationOrderRemoved(productDetailVariant: ProductDetailVariant)
 }

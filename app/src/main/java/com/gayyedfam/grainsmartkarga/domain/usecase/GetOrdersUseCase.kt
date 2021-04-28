@@ -13,7 +13,7 @@ class GetOrdersUseCase @Inject constructor(val productsRepository: ProductsRepos
         return productsRepository.getOrders()
     }
 
-    operator fun invoke(detailVariantId: Int): Single<List<ProductOrder>> {
+    operator fun invoke(detailVariantId: String): Single<List<ProductOrder>> {
         return productsRepository.getOrders(detailVariantId)
     }
 }

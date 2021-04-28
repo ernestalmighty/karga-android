@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/layoutHome"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -26,11 +27,18 @@
                     app:layout_constraintGuide_percent="0.4" />
 
                 <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineBrand"
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.6" />
+
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineBasket"
                     android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.93" />
+                    app:layout_constraintGuide_percent="0.97" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineMiddle"
@@ -53,23 +61,35 @@
                     android:layout_height="28dp"
                     android:src="@drawable/ic_basket"
                     android:layout_marginEnd="12dp"
+                    android:visibility="gone"
+                    android:transitionName="cartProductDetailTransition"
                     app:layout_constraintEnd_toEndOf="@+id/guidelineBasket"
                     app:layout_constraintStart_toStartOf="@+id/guidelineBasket"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textViewOrderBadge"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:textSize="10sp"
                     android:textColor="@android:color/white"
                     android:gravity="center"
+                    android:visibility="gone"
                     android:layout_marginStart="4dp"
                     app:layout_constraintStart_toStartOf="@+id/guidelineBasket"
                     app:layout_constraintTop_toTopOf="@+id/guidelineMiddle"
                     android:background="@android:color/darker_gray"
                     android:text="0"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_grainsmart"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintEnd_toEndOf="@id/guidelineBasket"
+                    app:layout_constraintStart_toStartOf="@+id/guidelineBrand"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -82,8 +102,42 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineToolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.0"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineCenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:translationZ="3dp"
+            app:layout_constraintTop_toTopOf="@+id/guidelineToolbar"
+            app:layout_constraintBottom_toBottomOf="@+id/guidelineToolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@android:style/Widget.Material.ProgressBar.Horizontal"
+            />
+
         <include layout="@layout/item_karga_branch"
             android:id="@+id/layoutKargaBranch"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -92,19 +146,79 @@
             android:id="@+id/layoutDeliveryAddress"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="10dp"
+            android:layout_margin="10dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewProducts"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutKargaBranch"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieEmptyBag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:lottie_rawRes="@raw/empty_bag_error"
+            app:lottie_loop="true"
+            app:lottie_autoPlay="true"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fabBasket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="14dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar"
+            android:transitionName="cartProductDetailTransition"
+            app:icon="@drawable/ic_basket"
+            app:iconTint="#FFFFFF"
+            app:layout_constraintBottom_toTopOf="@+id/adViewContainer"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewOrderBadge"
+            android:layout_width="18sp"
+            android:layout_height="18sp"
+            android:elevation="6dp"
+            android:gravity="center"
+            android:background="@drawable/bg_cart_badge"
+            android:text="0"
+            android:translationZ="3dp"
+            android:textColor="#000"
+            android:textSize="12sp"
+            app:layout_constraintTop_toTopOf="@id/fabBasket"
+            app:layout_constraintEnd_toEndOf="@id/fabBasket"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupCart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="fabBasket,textViewOrderBadge"/>
+
+        <RelativeLayout
+            android:id="@+id/adViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guidelineCenter"
+            app:layout_constraintEnd_toEndOf="@id/guidelineCenter">
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
