@@ -1,11 +1,11 @@
 package com.gayyedfam.grainsmartkarga.ui.home
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -25,10 +25,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_cart.*
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_home.layoutDeliveryAddress
-import kotlinx.android.synthetic.main.fragment_home.progressBar
 import kotlinx.android.synthetic.main.item_karga_branch.*
 
 @AndroidEntryPoint
@@ -58,16 +55,16 @@ class HomeFragment : Fragment(), ProductsItemListener {
                 it.store.contact?.let { text ->
                     valueBranchContact.text = text
                     valueBranchContact.visibility = View.VISIBLE
-                } ?: {
+                } ?: run {
                     valueBranchContact.visibility = View.GONE
-                }()
+                }
 
                 it.store.social?.let { text ->
                     valueBranchSocial.text = text
                     valueBranchSocial.visibility = View.VISIBLE
-                } ?: {
+                } ?: run {
                     valueBranchSocial.visibility = View.GONE
-                }()
+                }
             }
             is StoreState.UserStoreEmpty -> {
                 context?.let { ctx ->
@@ -89,7 +86,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
     }
 
     private fun showNoInternetConnectionDialog(): AlertDialog? {
-        return MaterialAlertDialogBuilder(context)
+        return MaterialAlertDialogBuilder(requireActivity())
             .setTitle("Your internet is not connected")
             .setMessage("Please ensure you have a stable network connection to get the latest products.")
             .setPositiveButton("Retry") { dialogInterface, i ->
@@ -103,7 +100,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
     }
 
     private fun showStoreEmptyDialog() {
-        MaterialAlertDialogBuilder(context)
+        MaterialAlertDialogBuilder(requireActivity())
             .setTitle("Sorry!")
             .setMessage("We cannot load the stores as of the moment. Please try again later.")
             .setPositiveButton("Retry") { dialogInterface, i ->
@@ -120,40 +117,40 @@ class HomeFragment : Fragment(), ProductsItemListener {
         list: Array<String>,
         stores: List<Store>
     ) {
-        val dialog = MaterialAlertDialogBuilder(context)
+        val dialog = MaterialAlertDialogBuilder(requireActivity())
             .setTitle("Choose your branch:")
             .setItems(list) { _, index ->
 
-                MaterialAlertDialogBuilder(context)
+                MaterialAlertDialogBuilder(requireActivity())
                     .setMessage("Selecting another store will clear your cart. Do you want to switch branch?")
                     .setPositiveButton(
-                        "YES",
-                        DialogInterface.OnClickListener { dialogInterface, i ->
-                            val store = stores[index]
+                        "YES"
+                    ) { dialogInterface, _ ->
+                        val store = stores[index]
 
-                            valueBranch.text = store.name
-                            valueBranchAddress.text = store.address
+                        valueBranch.text = store.name
+                        valueBranchAddress.text = store.address
 
-                            store.contact?.let { text ->
-                                valueBranchContact.text = text
-                                valueBranchContact.visibility = View.VISIBLE
-                            } ?: {
-                                valueBranchContact.visibility = View.GONE
-                            }()
+                        store.contact?.let { text ->
+                            valueBranchContact.text = text
+                            valueBranchContact.visibility = View.VISIBLE
+                        } ?: run {
+                            valueBranchContact.visibility = View.GONE
+                        }
 
-                            store.social?.let { text ->
-                                valueBranchSocial.text = text
-                                valueBranchSocial.visibility = View.VISIBLE
-                            } ?: {
-                                valueBranchSocial.visibility = View.GONE
-                            }()
+                        store.social?.let { text ->
+                            valueBranchSocial.text = text
+                            valueBranchSocial.visibility = View.VISIBLE
+                        } ?: run {
+                            valueBranchSocial.visibility = View.GONE
+                        }
 
-                            homeViewModel.clearOrders()
-                            homeViewModel.storeSelected(store)
+                        homeViewModel.clearOrders()
+                        homeViewModel.storeSelected(store)
 
-                            isShowingDialog = false
-                            dialogInterface.dismiss()
-                        })
+                        isShowingDialog = false
+                        dialogInterface.dismiss()
+                    }
                     .setNegativeButton(
                         "CANCEL"
                     ) { dialogInterface, i ->
@@ -189,8 +186,8 @@ class HomeFragment : Fragment(), ProductsItemListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adView = AdView(context)
-        adView.adSize = AdSize.SMART_BANNER
+        val adView = AdView(requireContext())
+        adView.setAdSize(AdSize.FULL_BANNER)
         adView.adUnitId = BuildConfig.AD_MOB_BANNER_ID
 
         adViewContainer.addView(adView)
@@ -226,6 +223,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
                 is OrderBasketState.OrdersLoadError -> {
                     setBasketQuantity("0")
                 }
+                else -> {}
             }
         })
 
@@ -256,7 +254,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
         recyclerViewProducts.adapter = productsGridAdapter
 
         productsGridAdapter.productsList = list
-        productsGridAdapter.notifyDataSetChanged()
+        productsGridAdapter.notifyItemRangeChanged(0, list.size)
     }
 
     override fun onProductClicked(product: Product) {
@@ -266,8 +264,8 @@ class HomeFragment : Fragment(), ProductsItemListener {
         val directions = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(
             product.productId,
             product.name,
-            product.productType,
-            product.iconUrl
+            product.iconUrl,
+            product.productType
         )
         findNavController().navigate(directions, extras)
     }

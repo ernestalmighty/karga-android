@@ -145,6 +145,9 @@ class ProfileFragment : Fragment() {
                 is ProfileViewState.DeviceAddressLoaded -> {
 
                 }
+                else -> {
+
+                }
             }
         })
     }

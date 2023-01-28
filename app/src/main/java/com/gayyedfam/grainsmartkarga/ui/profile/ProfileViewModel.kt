@@ -1,6 +1,5 @@
 package com.gayyedfam.grainsmartkarga.ui.profile
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gayyedfam.grainsmartkarga.data.model.Profile
@@ -8,14 +7,17 @@ import com.gayyedfam.grainsmartkarga.domain.usecase.GetDeviceLocationUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetProfileUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.SaveProfileUseCase
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 /**
  * Created by emgayyed on 1/8/20.
  */
-class ProfileViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     private val saveProfileUseCase: SaveProfileUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val getDeviceLocationUseCase: GetDeviceLocationUseCase

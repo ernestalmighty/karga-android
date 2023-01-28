@@ -1,6 +1,5 @@
 package com.gayyedfam.grainsmartkarga.ui.orderlist
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.EmptyResultSetException
@@ -10,15 +9,18 @@ import com.gayyedfam.grainsmartkarga.data.model.Profile
 import com.gayyedfam.grainsmartkarga.domain.usecase.*
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
 import com.gayyedfam.grainsmartkarga.ui.profile.ProfileViewState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
 /**
  * Created by emgayyed on 24/7/20.
  */
-class OrderListViewModel @ViewModelInject constructor(val getOrdersUseCase: GetOrdersUseCase,
+@HiltViewModel
+class OrderListViewModel @Inject constructor(val getOrdersUseCase: GetOrdersUseCase,
                                                       val getProfileUseCase: GetProfileUseCase,
                                                       val saveOrdersUseCase: SaveOrdersUseCase,
                                                       val getOrderHistoryUseCase: GetOrderHistoryUseCase,

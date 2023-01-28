@@ -107,6 +107,7 @@ class ProductDetailFragment : Fragment(), ProductsItemPricingListener {
                         buttonViewCart.visibility = View.VISIBLE
                     }
                 }
+                else -> {}
             }
         })
 

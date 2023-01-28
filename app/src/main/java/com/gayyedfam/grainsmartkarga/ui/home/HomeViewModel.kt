@@ -2,21 +2,23 @@ package com.gayyedfam.grainsmartkarga.ui.home
 
 import android.location.Location
 import android.util.Log
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.EmptyResultSetException
 import com.gayyedfam.grainsmartkarga.data.model.DeviceLocation
 import com.gayyedfam.grainsmartkarga.data.model.Store
 import com.gayyedfam.grainsmartkarga.domain.usecase.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 /**
  * Created by emgayyed on 18/7/20.
  */
-class HomeViewModel @ViewModelInject constructor(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     val getProductsUseCase: GetProductsUseCase,
     val getOrdersUseCase: GetOrdersUseCase,
     val getUserStoreUseCase: GetUserStoreUseCase,

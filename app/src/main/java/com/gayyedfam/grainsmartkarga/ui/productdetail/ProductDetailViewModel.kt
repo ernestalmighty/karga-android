@@ -1,6 +1,5 @@
 package com.gayyedfam.grainsmartkarga.ui.productdetail
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gayyedfam.grainsmartkarga.data.model.ProductDetailVariant
@@ -10,14 +9,17 @@ import com.gayyedfam.grainsmartkarga.domain.usecase.GetOrdersUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.GetProductDetailsUseCase
 import com.gayyedfam.grainsmartkarga.domain.usecase.UpdateOrderCartUseCase
 import com.gayyedfam.grainsmartkarga.ui.home.OrderBasketState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 /**
  * Created by emgayyed on 19/7/20.
  */
-class ProductDetailViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ProductDetailViewModel @Inject constructor(
     val getProductDetailsUseCase: GetProductDetailsUseCase,
     val updateOrderCartUseCase: UpdateOrderCartUseCase,
     val getOrdersUseCase: GetOrdersUseCase): ViewModel() {

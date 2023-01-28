@@ -38,6 +38,7 @@ class SplashActivity : AppCompatActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish();
                 }
+                else -> {}
             }
         })
     }
@@ -46,6 +47,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>,
                                             grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
                 if (grantResults.isNotEmpty() &&
@@ -76,21 +78,14 @@ class SplashActivity : AppCompatActivity() {
                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
                 val locationCallback = object : LocationCallback() {
-                    override fun onLocationResult(locationResult: LocationResult?) {
-                        locationResult?.let {result ->
-                            fusedLocationClient.removeLocationUpdates(this)
-                            result.locations.forEach {newLocation ->
-                                if(!hasExpired) {
-                                    hasExpired = true
-                                    splashViewModel.storeUserLocation(newLocation.latitude, newLocation.longitude)
-                                }
-                            }
-                        } ?: {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        fusedLocationClient.removeLocationUpdates(this)
+                        locationResult.locations.forEach {newLocation ->
                             if(!hasExpired) {
                                 hasExpired = true
-                                splashViewModel.storeUserLocation(lastLocation.latitude, lastLocation.longitude)
+                                splashViewModel.storeUserLocation(newLocation.latitude, newLocation.longitude)
                             }
-                        }()
+                        }
                     }
                 }
 

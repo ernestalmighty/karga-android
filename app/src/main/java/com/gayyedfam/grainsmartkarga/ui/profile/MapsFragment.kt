@@ -3,6 +3,7 @@ package com.gayyedfam.grainsmartkarga.ui.profile
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
@@ -137,8 +138,8 @@ class MapsFragment : Fragment() {
                         locationRequest.interval = 20 * 1000
 
                         val locationCallback = object : LocationCallback() {
-                            override fun onLocationResult(locationResult: LocationResult?) {
-                                locationResult?.let {result ->
+                            override fun onLocationResult(locationResult: LocationResult) {
+                                locationResult.let {result ->
                                     fusedLocationClient.removeLocationUpdates(this)
                                     result.locations.forEach {newLocation ->
                                         updateLocationMarker(newLocation.latitude, newLocation.longitude)
@@ -170,24 +171,30 @@ class MapsFragment : Fragment() {
 
             moveCamera(CameraUpdateFactory.newLatLngZoom(updatedLocation, 18.0f))
 
-            val geoCoder = Geocoder(context)
-            val address = geoCoder.getFromLocation(latitude, longitude, 1)
+            val geoCoder = Geocoder(requireContext())
 
-            val firstAddress = address.first()
 
-            val deviceAddress = StringBuilder()
-                .append(firstAddress.subThoroughfare)
-                .append(firstAddress.adminArea)
-                //.append(firstAddress.countryCode)
-                .append(firstAddress.countryName)
-                //.append(firstAddress.featureName)
-                .append(firstAddress.locale)
-                .append(firstAddress.locality)
-            //.append(firstAddress.premises)
-            //.append(firstAddress.subAdminArea)
-            //.append(firstAddress.phone)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geoCoder.getFromLocation(latitude, longitude, 1, Geocoder.GeocodeListener {
+                    val firstAddress = it.first()
 
-            //textEditAddress.setText(deviceAddress.toString())
+                    val deviceAddress = StringBuilder()
+                        .append(firstAddress.subThoroughfare)
+                        .append(firstAddress.adminArea)
+                        //.append(firstAddress.countryCode)
+                        .append(firstAddress.countryName)
+                        //.append(firstAddress.featureName)
+                        .append(firstAddress.locale)
+                        .append(firstAddress.locality)
+                    //.append(firstAddress.premises)
+                    //.append(firstAddress.subAdminArea)
+                    //.append(firstAddress.phone)
+
+                    //textEditAddress.setText(deviceAddress.toString())
+                })
+            } else {
+                geoCoder.getFromLocation(latitude, longitude, 1)
+            }
         }
     }
 

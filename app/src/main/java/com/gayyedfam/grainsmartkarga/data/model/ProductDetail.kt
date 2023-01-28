@@ -1,9 +1,6 @@
 package com.gayyedfam.grainsmartkarga.data.model
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 /**

@@ -39,15 +39,11 @@ class LocationUtil(val activity: AppCompatActivity) {
                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
                 val locationCallback = object : LocationCallback() {
-                    override fun onLocationResult(locationResult: LocationResult?) {
-                        locationResult?.let {result ->
-                            fusedLocationClient.removeLocationUpdates(this)
-                            result.locations.forEach {newLocation ->
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        fusedLocationClient.removeLocationUpdates(this)
+                        locationResult.locations.forEach { newLocation ->
 
-                            }
-                        } ?: {
-
-                        }()
+                        }
                     }
                 }
 
