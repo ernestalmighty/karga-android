@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Grainsmart_Karga.iml" filepath="$PROJECT_DIR$/.idea/modules/Grainsmart_Karga.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Grainsmart_Karga.app.unitTest.iml" />
+    </modules>
+  </component>
+</project>
