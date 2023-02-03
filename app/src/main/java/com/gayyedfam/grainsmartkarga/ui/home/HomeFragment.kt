@@ -27,6 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.item_karga_branch.*
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), ProductsItemListener {
@@ -194,6 +195,9 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
+
+        val greetings = arrayOf("Nakapag saing ka na ba?", "Drink your water besh", "Order na dito!", "Magandang araw!", "Wag kang papagutom ha?")
+        txtGreeting.text = greetings[Random.nextInt(greetings.size)]
 
         homeViewModel.homeStateLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {

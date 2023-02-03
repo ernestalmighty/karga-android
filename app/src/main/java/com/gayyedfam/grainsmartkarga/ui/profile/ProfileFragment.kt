@@ -47,22 +47,16 @@ class ProfileFragment : Fragment() {
                 val addressComponents = place.addressComponents
                 val clientAddress = StringBuilder()
                 addressComponents?.let { component ->
-                    if(addressComponents.asList().size < 5) {
-                        textInputAddress.error = "Please input a more detailed address."
-                        textEditAddress.setText("")
-                        textEditDetailAddress.setText("")
-                    } else {
-                        textInputAddress.error = ""
-                        component.asList().forEach { address ->
-                            clientAddress.append(address.name)
-                            clientAddress.append(" ")
-                        }
-
-                        textEditAddress.setText(clientAddress.toString())
-                        textEditDetailAddress.setText(name)
-
-                        profileViewModel.locationSelected(latLang)
+                    textInputAddress.error = ""
+                    component.asList().forEach { address ->
+                        clientAddress.append(address.name)
+                        clientAddress.append(" ")
                     }
+
+                    textEditAddress.setText(clientAddress.toString())
+                    textEditDetailAddress.setText(name)
+
+                    profileViewModel.locationSelected(latLang)
                 }
             }
         }

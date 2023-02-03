@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Observer
 import com.gayyedfam.grainsmartkarga.ui.main.MainActivity
 import com.google.android.gms.location.*
@@ -27,7 +28,10 @@ class SplashActivity : AppCompatActivity() {
     private val splashViewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition { true }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         setupLocationClient()

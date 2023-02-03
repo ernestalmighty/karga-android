@@ -16,9 +16,9 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textAllCaps="true"
-            android:text="Store:" />
+            android:text="Select your store" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/valueBranch"
@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewBranch"
+            android:layout_marginTop="4dp"
             android:textStyle="bold"
             android:textSize="16sp"
             android:text="Not set." />
