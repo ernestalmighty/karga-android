@@ -34,7 +34,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private var isShowingDialog = false
-    private lateinit var adView: AdView
+    private var adView: AdView? = null
 
     private val storeStateObserver = Observer<StoreState> {
         when(it) {
@@ -180,7 +180,7 @@ class HomeFragment : Fragment(), ProductsItemListener {
     }
 
     override fun onDestroy() {
-        adView.destroy()
+        adView?.destroy()
         super.onDestroy()
     }
 

@@ -15,10 +15,14 @@ android {
         applicationId "com.gayyedfam.grainsmartkarga"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 18
-        versionName "2.6"
+        versionCode 20
+        versionName "2.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "PLACES_API_KEY", "\"AIzaSyBVCx7vWCTkLAGHf3w4nsOZF78VZyuMVhw\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"AIzaSyAC_g7co2iQIbYV1TG00F4t2io6AxmMAvY\"")
+        buildConfigField("String", "FACEBOOK_APP_ID", "\"1694922733995611\"")
     }
 
     buildTypes {
@@ -123,5 +127,5 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'com.facebook.android:audience-network-sdk:5.11.0'
 
-
+    implementation 'androidx.core:core-splashscreen:1.0.0'
 }

@@ -16,14 +16,13 @@ import dagger.hilt.android.HiltAndroidApp
 class GrainsmartKargaApp: Application() {
     override fun onCreate() {
         super.onCreate()
-
-        FacebookSdk.setApplicationId(this.getString(R.string.facebook_app_id))
+        FacebookSdk.setApplicationId(BuildConfig.FACEBOOK_APP_ID)
         FacebookSdk.sdkInitialize(this)
         FacebookSdk.setAutoLogAppEventsEnabled(true)
 
         AudienceNetworkInitializeHelper.initialize(this)
         // Initialize the SDK
-        Places.initialize(applicationContext, "AIzaSyBVCx7vWCTkLAGHf3w4nsOZF78VZyuMVhw")
+        Places.initialize(applicationContext, BuildConfig.PLACES_API_KEY)
         Places.createClient(this)
     }
 }

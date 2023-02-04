@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
+import com.gayyedfam.grainsmartkarga.BuildConfig
 import com.gayyedfam.grainsmartkarga.R
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -51,7 +52,7 @@ class MapsFragment : Fragment() {
 
         context?.let {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(it)
-            Places.initialize(it, it.getString(R.string.google_maps_key))
+            Places.initialize(it, BuildConfig.MAPS_API_KEY)
             Places.createClient(it)
         }
 
