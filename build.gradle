@@ -19,6 +19,16 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "3.5.0.2730"
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "ernestalmighty_karga-android_AYcMEUUAUKYvtP1myXOV"
+    }
+}
+
 allprojects {
     repositories {
         google()
